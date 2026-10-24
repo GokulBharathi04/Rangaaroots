@@ -47,7 +47,8 @@ window.Motion = (() => {
   const curtains = safe(() => {
     $$("[data-curtain]").forEach((frame) => {
       const pic = frame.firstElementChild;
-      gsap.timeline({ scrollTrigger: { trigger: frame, start: "top 85%", once: true } })
+      // trigger on the parent: the frame itself starts translated a full height down
+      gsap.timeline({ scrollTrigger: { trigger: frame.parentElement, start: "top 85%", once: true } })
         .fromTo(frame, { yPercent: 100, autoAlpha: 1 }, { yPercent: 0, duration: 1.4, ease: "expo.inOut" }, 0)
         .fromTo(pic, { yPercent: -100, scale: 1.15 }, { yPercent: 0, duration: 1.4, ease: "expo.inOut" }, 0)
         .to(pic, { scale: 1, duration: 1.8, ease: EASE }, 0.9);
