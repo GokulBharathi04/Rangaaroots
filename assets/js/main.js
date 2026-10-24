@@ -184,5 +184,6 @@
   M.bind();
   M.hero();
   M.marquee($("#marquee"));
+  M.process($("#process"));
   M.scrollFx({ progressEl: $("#progress") });
 })();

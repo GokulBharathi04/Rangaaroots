@@ -110,6 +110,51 @@ window.Motion = (() => {
     gsap.to(bg, { yPercent: 14, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
   });
 
+  /* ---------- Bilona process: a gold line runs through five stages ----------
+   * Desktop: the section pins under the header and the scroll scrubs one timeline
+   * (line draws across, each stage's dot fills and its text rises as the line arrives).
+   * Smaller or short screens: no pin; the line fills down the left as you scroll. */
+  const process = safe((section) => {
+    const fill = $(".process__fill", section);
+    const steps = $$(".step", section);
+    const parts = (s) => s.querySelectorAll(".step__n, .ic, h3, p");
+    const dot = (s) => $(".step__dot i", s);
+    const mm = gsap.matchMedia();
+
+    mm.add("(min-width: 1081px) and (min-height: 640px)", () => {
+      section.classList.add("is-pinnable");
+      const header = () => $("#nav").offsetHeight;
+      const tl = gsap.timeline({
+        defaults: { ease: "power3.out" },
+        scrollTrigger: {
+          trigger: section, start: () => `top ${header()}`, end: () => "+=" + innerHeight * 2.4,
+          scrub: 1, pin: true, anticipatePin: 1, invalidateOnRefresh: true,
+        },
+      });
+      // stage i sits about i/5 along the line, so it lights up at time i
+      tl.fromTo(fill, { scaleX: 0 }, { scaleX: 1, ease: "none", duration: steps.length }, 0);
+      steps.forEach((s, i) => {
+        tl.fromTo(dot(s), { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2)" }, i + 0.02)
+          .fromTo(parts(s), { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.6, stagger: 0.08 }, i + 0.05);
+      });
+      tl.to({}, { duration: 0.6 });   // a short hold on the finished line before the pin releases
+      return () => section.classList.remove("is-pinnable");
+    });
+
+    mm.add("(max-width: 1080px), (max-height: 639px)", () => {
+      const axis = matchMedia("(max-width: 1080px)").matches ? "scaleY" : "scaleX";
+      gsap.fromTo(fill, { [axis]: 0 }, {
+        [axis]: 1, ease: "none",
+        scrollTrigger: { trigger: $(".process__track", section), start: "top 75%", end: "bottom 65%", scrub: 0.6 },
+      });
+      steps.forEach((s) => {
+        gsap.timeline({ scrollTrigger: { trigger: s, start: "top 82%", once: true } })
+          .fromTo(dot(s), { scale: 0 }, { scale: 1, duration: 0.5, ease: "back.out(2)" }, 0)
+          .fromTo(parts(s), { y: 32, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1, ease: EASE, stagger: 0.08 }, 0.1);
+      });
+    });
+  });
+
   /* ---------- Marquee: steady drift, speeds up with scroll velocity, eases to a stop on hover ---------- */
   const marquee = safe((el) => {
     const track = $(".marquee__track", el);
@@ -207,5 +252,5 @@ window.Motion = (() => {
     }
   }
 
-  return { reduce, G, safe, reveals, countUp, hero, marquee, magnetic, scrollFx, tabIndicator, flip, bind };
+  return { reduce, G, safe, reveals, countUp, hero, process, marquee, magnetic, scrollFx, tabIndicator, flip, bind };
 })();
