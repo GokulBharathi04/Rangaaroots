@@ -27,22 +27,44 @@
   addEventListener("scroll", () => nav.classList.toggle("is-solid", scrollY > 40), { passive: true });
   nav.classList.toggle("is-solid", scrollY > 40);
 
-  menuBtn.addEventListener("click", () => {
-    const open = nav.classList.toggle("menu-open");
+  // full-screen menu on small screens; page scrolling pauses while it is open
+  const setMenu = (open) => {
+    nav.classList.toggle("menu-open", open);
     menuBtn.setAttribute("aria-expanded", open);
+    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    open ? window.Scroll.stop() : window.Scroll.start();
+  };
+  menuBtn.addEventListener("click", () => setMenu(!nav.classList.contains("menu-open")));
+  $$("#navLinks a").forEach((a) => a.addEventListener("click", () => setMenu(false)));
+  addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && nav.classList.contains("menu-open")) { setMenu(false); menuBtn.focus(); }
   });
-  $$("#navLinks a").forEach((a) => a.addEventListener("click", () => {
-    nav.classList.remove("menu-open");
-    menuBtn.setAttribute("aria-expanded", "false");
-  }));
+
+  // gold underline glides to the link of the section in view
+  const ink = $("#navInk");
+  const placeInk = () => {
+    const a = $("#navLinks a.is-active");
+    ink.style.setProperty("--o", a ? 1 : 0);
+    if (!a) return;
+    ink.style.setProperty("--x", a.offsetLeft + 14 + "px");
+    ink.style.setProperty("--w", a.offsetWidth - 28);
+  };
+  addEventListener("resize", placeInk);
 
   const sectionObs = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       if (!e.isIntersecting) return;
       $$("#navLinks a").forEach((a) => a.classList.toggle("is-active", a.getAttribute("href") === "#" + e.target.id));
+      placeInk();
     });
   }, { rootMargin: "-45% 0px -50% 0px" });
   ["ghee", "shop", "process", "trace", "story"].forEach((id) => sectionObs.observe(document.getElementById(id)));
+  // leaving all tracked sections (back to the hero) clears the underline
+  addEventListener("scroll", () => {
+    if (scrollY >= innerHeight * 0.5) return;
+    const active = $("#navLinks a.is-active");
+    if (active) { active.classList.remove("is-active"); placeInk(); }
+  }, { passive: true });
 
   /* ---------- Flagship ghee ---------- */
   $("#gheeSub").textContent = ghee.subtitle;
@@ -52,9 +74,13 @@
   /* ---------- Products: render once, filter with FLIP ---------- */
   const grid = $("#grid");
   grid.innerHTML = products.map((p) => `
-    <article class="card sheet" data-id="${p.id}" data-cat="${p.cat}" data-tilt>
+    <article class="card" data-id="${p.id}" data-cat="${p.cat}">
       <div class="card__img">
-        <img src="assets/img/products/${p.img}" alt="${p.name}" loading="lazy" width="600" height="600">
+        <picture>
+          <source srcset="assets/img/products/${p.img.replace(/\.jpg$/, "-480.webp")} 480w, assets/img/products/${p.img.replace(/\.jpg$/, ".webp")} 900w"
+            sizes="(max-width: 600px) 46vw, (max-width: 1080px) 31vw, 300px" type="image/webp">
+          <img src="assets/img/products/${p.img}" alt="${p.name}" loading="lazy" width="600" height="600">
+        </picture>
       </div>
       <div class="card__body">
         ${p.size ? `<span class="card__size">${p.size}</span>` : ""}
@@ -66,14 +92,15 @@
       </div>
     </article>`).join("");
   const cards = $$(".card", grid);
-  // first appearance: each row of cards rises in sequence
+  // first appearance: each row of cards rises in sequence. Cards are never hidden by CSS,
+  // so one filtered out before it was seen still shows normally when it comes back.
   if (!M.reduce) {
     const cardIO = new IntersectionObserver((entries) => entries.forEach((e) => {
       if (!e.isIntersecting) return;
       cardIO.unobserve(e.target);
-      e.target.animate([{ opacity: 0, translate: "0 14px" }, { opacity: 1, translate: "0 0" }],
-        { duration: 600, easing: "cubic-bezier(.2,.8,.2,1)", delay: (cards.indexOf(e.target) % 4) * 70, fill: "backwards" });
-    }), { threshold: 0.15 });
+      e.target.animate([{ opacity: 0, translate: "0 40px" }, { opacity: 1, translate: "0 0" }],
+        { duration: 1100, easing: "cubic-bezier(.16,1,.3,1)", delay: (cards.indexOf(e.target) % 4) * 90, fill: "backwards" });
+    }), { threshold: 0.12 });
     cards.forEach((c) => cardIO.observe(c));
   }
 
@@ -81,7 +108,7 @@
   const chips = $("#chips");
   chips.insertAdjacentHTML("beforeend", categories.map((c) =>
     `<button type="button" class="chip" role="tab" data-cat="${c.id}" aria-selected="${c.id === activeCat}">${c.label}</button>`).join(""));
-  const placeIndicator = M.tabIndicator(chips, $("#chipIndicator"));
+  let placeIndicator = () => {};   // set once every section is rendered (see below)
 
   const applyFilter = () => {
     const q = query.trim().toLowerCase();
@@ -147,9 +174,8 @@
 
   /* ---------- Reviews (paper notes) ---------- */
   $("#reviews").innerHTML = reviews.map((r, i) => `
-    <article class="review sheet" data-reveal data-tilt style="--rot:${[-1.2, 0.8, -0.6, 1.1][i % 4]}deg">
-      <span class="tape" aria-hidden="true"></span>
-      <span class="stars" aria-label="5 out of 5 stars">${icon("star").repeat(5)}</span>
+    <article class="review" data-reveal>
+      <span class="stars" role="img" aria-label="5 out of 5 stars">${icon("star").repeat(5)}</span>
       <h3>${r.title}</h3>
       <p>“${r.text}”</p>
       <footer><span class="avatar" aria-hidden="true">${r.name.replace(/^S\. /, "")[0]}</span><span><b>${r.name}</b>${r.place}</span></footer>
@@ -159,7 +185,15 @@
   $("#footAddr").textContent = brand.address;
   $("#year").textContent = new Date().getFullYear();
 
+  // first measurement only after all the content above is in, so the page is laid out once
+  placeIndicator = M.tabIndicator(chips, $("#chipIndicator"));
+
   /* ---------- Motion ---------- */
-  M.bind();
+  // hero first (it is on screen), then the rest one step per task
+  M.bind([
+    () => M.hero(),
+    () => M.marquee($("#marquee")),
+    () => M.process($("#process")),
+  ]);
   M.scrollFx({ progressEl: $("#progress") });
 })();
