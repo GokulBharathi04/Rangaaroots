@@ -1,93 +1,131 @@
-/* Rangaa Roots — motion components (no dependencies)
+/* Rangaa Roots — motion (GSAP + ScrollTrigger, synced to Lenis in scroll.js)
  *
  * Opt in from markup:
- *   data-reveal            fade + 12px rise when scrolled into view
- *   data-stagger           on a parent: its [data-reveal] children enter one after another
- *   data-split             headline words rise in sequence (short headlines only)
- *   data-tilt              paper sheet tilts toward the pointer and lifts
+ *   data-reveal            rises 40px and fades in as it enters; neighbours entering together stagger
+ *   data-curtain           image frame wipes up while its picture counter-moves and settles from 1.15x
+ *   data-parallax="12"     drifts through the viewport by that many percent of its own height
+ *   data-glow              slow golden light swells once when scrolled into view
+ *   data-count="40"        counts up (data-count="25,30" + data-join="–" for a range; data-prefix / data-suffix)
  *   data-magnetic          button drifts a few px toward the pointer
- *   data-parallax="0.2"    layer moves at a fraction of scroll speed
- *   data-count="40"        number counts up when visible (data-prefix / data-suffix)
  *
- * Every component is skipped (final state shown) under prefers-reduced-motion.
- * Tilt and magnetic only run on fine pointers (mouse / trackpad).
+ * <html class="motion"> is set in <head> before first paint; CSS hides animated parts only
+ * under that class. Without GSAP, under prefers-reduced-motion, or if anything here throws,
+ * the class is removed and every element shows in its final state.
  */
 window.Motion = (() => {
+  const root = document.documentElement;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const G = !reduce && window.Scroll?.hasGsap;
+  const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const EASE = "expo.out";
 
-  /* ---------- Reveal ---------- */
-  const revealIO = new IntersectionObserver((entries) => {
-    entries.forEach((e) => {
-      if (!e.isIntersecting) return;
-      e.target.classList.add("is-in");
-      revealIO.unobserve(e.target);
+  const showAll = () => root.classList.remove("motion");
+  if (!G) showAll();
+
+  /* Run a motion step; if it throws, fall back to the static page rather than leave things hidden. */
+  const safe = (fn) => (...args) => {
+    if (!G) return;
+    try { fn(...args); } catch (err) { console.error(err); showAll(); }
+  };
+
+  /* ---------- Reveal: batched so things entering together stagger ---------- */
+  const reveals = safe((root = document) => {
+    const els = $$("[data-reveal]:not([data-revealed])", root);
+    els.forEach((el) => (el.dataset.revealed = ""));
+    ScrollTrigger.batch(els, {
+      start: "top 88%",
+      once: true,
+      onEnter: (batch) => gsap.fromTo(batch,
+        { y: 40, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 1.15, ease: EASE, stagger: 0.09, overwrite: true, clearProps: "transform" }),
     });
-  }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+  });
 
-  function reveal(root = document) {
-    $$("[data-reveal]:not(.is-in)", root).forEach((el) => {
-      const group = el.parentElement?.closest("[data-stagger]");
-      if (group) {
-        const i = $$(":scope > [data-reveal]", el.parentElement).indexOf(el);
-        el.style.setProperty("--rd", Math.min(Math.max(i, 0), 6) * 80 + "ms");
-      }
-      if (reduce) el.classList.add("is-in"); else revealIO.observe(el);
+  /* ---------- Curtain: transform-only image wipe ---------- */
+  const curtains = safe(() => {
+    $$("[data-curtain]").forEach((frame) => {
+      const pic = frame.firstElementChild;
+      gsap.timeline({ scrollTrigger: { trigger: frame, start: "top 85%", once: true } })
+        .fromTo(frame, { yPercent: 100, autoAlpha: 1 }, { yPercent: 0, duration: 1.4, ease: "expo.inOut" }, 0)
+        .fromTo(pic, { yPercent: -100, scale: 1.15 }, { yPercent: 0, duration: 1.4, ease: "expo.inOut" }, 0)
+        .to(pic, { scale: 1, duration: 1.8, ease: EASE }, 0.9);
     });
-  }
+  });
 
-  /* ---------- Split headline into words ---------- */
-  function splitWords(el) {
-    if (reduce || el.dataset.splitDone) return;
-    el.setAttribute("aria-label", el.textContent.replace(/\s+/g, " ").trim());
-    let wi = 0;
-    $$(".line", el).forEach((line) => {
-      line.setAttribute("aria-hidden", "true");
-      const words = line.textContent.trim().split(/\s+/);
-      line.textContent = "";
-      words.forEach((word, n) => {
-        const outer = document.createElement("span");
-        const inner = document.createElement("span");
-        outer.className = "w";
-        inner.className = "w__i";
-        inner.style.setProperty("--wi", wi++);
-        inner.textContent = word;
-        outer.append(inner);
-        line.append(outer, n < words.length - 1 ? " " : "");
+  /* ---------- Parallax drift ---------- */
+  const parallax = safe(() => {
+    $$("[data-parallax]").forEach((el) => {
+      const v = +el.dataset.parallax || 10;
+      gsap.fromTo(el, { yPercent: -v / 2 }, {
+        yPercent: v / 2, ease: "none",
+        scrollTrigger: { trigger: el.parentElement, start: "top bottom", end: "bottom top", scrub: true },
       });
     });
-    el.dataset.splitDone = "1";
-    requestAnimationFrame(() => el.classList.add("is-split"));
-  }
+  });
 
-  /* ---------- Tilt (paper lifts toward the pointer) ---------- */
-  function tilt(el, max = 5) {
-    if (reduce || !finePointer || el.dataset.tiltBound) return;
-    el.dataset.tiltBound = "1";
-    let raf = 0;
-    const move = (e) => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const r = el.getBoundingClientRect();
-        const px = (e.clientX - r.left) / r.width - 0.5;
-        const py = (e.clientY - r.top) / r.height - 0.5;
-        el.style.setProperty("--ry", (px * max).toFixed(2) + "deg");
-        el.style.setProperty("--rx", (-py * max).toFixed(2) + "deg");
-      });
-    };
-    el.addEventListener("pointerenter", () => el.classList.add("is-lifted"));
-    el.addEventListener("pointermove", move);
-    el.addEventListener("pointerleave", () => {   // always reverse on exit
-      cancelAnimationFrame(raf);
-      el.classList.remove("is-lifted");
-      el.style.setProperty("--rx", "0deg");
-      el.style.setProperty("--ry", "0deg");
+  /* ---------- Golden glow ---------- */
+  const glows = safe(() => {
+    $$("[data-glow]").forEach((el) => {
+      ScrollTrigger.create({ trigger: el, start: "top 75%", once: true, onEnter: () => el.classList.add("is-glowing") });
     });
+  });
+
+  /* ---------- Count up (text is final in the DOM; a ghost keeps the box from resizing) ---------- */
+  function prepCount(el) {
+    const ends = el.dataset.count.split(",").map(Number);
+    const fmt = (p) => (el.dataset.prefix || "") + ends.map((n) => Math.round(n * p)).join(el.dataset.join || "") + (el.dataset.suffix || "");
+    const span = (cls, text) => Object.assign(document.createElement("span"), { className: cls, textContent: text || "" });
+    const final = fmt(1);
+    const box = span("count");
+    const val = span("count__val", final);
+    box.setAttribute("aria-hidden", "true");
+    box.append(span("count__ghost", final), val);
+    el.replaceChildren(span("sr-only", final), box);
+    return { val, fmt };
   }
+  const countUp = safe((el, delay = 0) => {
+    const { val, fmt } = prepCount(el);
+    const o = { p: 0 };
+    val.textContent = fmt(0);
+    gsap.to(o, { p: 1, duration: 2.2, delay, ease: "power3.out", onUpdate: () => (val.textContent = fmt(o.p)) });
+  });
+
+  /* ---------- Hero entrance + temple parallax ---------- */
+  const hero = safe(() => {
+    const bg = $("#heroBg");
+    const tl = gsap.timeline({ defaults: { ease: EASE } });
+    tl.fromTo(bg, { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 2.6, ease: "power2.out" }, 0)
+      .fromTo(".hero .eyebrow", { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.1 }, 0.25)
+      .fromTo(".hero__title .line__i", { yPercent: 110, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 1.4, stagger: 0.16 }, 0.35)
+      .fromTo(".hero__lead", { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.3 }, 0.85)
+      .fromTo(".hero__cta .btn", { y: 18, scale: 0.94, autoAlpha: 0 }, { y: 0, scale: 1, autoAlpha: 1, duration: 1.2, stagger: 0.12 }, 1.05)
+      .fromTo(".hero__stats .stat", { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.2, stagger: 0.12 }, 1.25);
+    $$(".hero__stats [data-count]").forEach((el, i) => countUp(el, 1.3 + i * 0.12));
+
+    // the temple drifts down at a fraction of scroll speed while the hero leaves; its
+    // top edge only uncovers once that part of the hero is already off screen
+    gsap.to(bg, { yPercent: 14, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+  });
+
+  /* ---------- Marquee: steady drift, speeds up with scroll velocity, eases to a stop on hover ---------- */
+  const marquee = safe((el) => {
+    const track = $(".marquee__track", el);
+    const loop = gsap.to(track, { xPercent: -50, duration: 55, ease: "none", repeat: -1 });
+    let hovering = false;
+    const ease = (to, d = 0.8) => gsap.to(loop, { timeScale: to, duration: d, ease: "power2.out", overwrite: true });
+    el.addEventListener("pointerenter", () => { hovering = true; ease(0, 1); });
+    el.addEventListener("pointerleave", () => { hovering = false; ease(1, 1.2); });
+    window.Scroll.lenis?.on("scroll", ({ velocity }) => {
+      if (hovering) return;
+      gsap.to(loop, { timeScale: 1 + Math.min(Math.abs(velocity) * 0.25, 4), duration: 0.25, overwrite: true });
+      gsap.to(loop, { timeScale: 1, duration: 1.2, delay: 0.25, ease: "power2.out" });
+    });
+  });
 
   /* ---------- Magnetic buttons ---------- */
-  function magnetic(el, strength = 0.28, limit = 8) {
+  function magnetic(el, strength = 0.25, limit = 7) {
     if (reduce || !finePointer || el.dataset.magBound) return;
     el.dataset.magBound = "1";
     const clamp = (v) => Math.max(-limit, Math.min(limit, v));
@@ -102,42 +140,18 @@ window.Motion = (() => {
     });
   }
 
-  /* ---------- Scroll-linked: parallax + progress bar ---------- */
+  /* ---------- Reading progress bar ---------- */
   function scrollFx({ progressEl } = {}) {
-    const layers = reduce ? [] : $$("[data-parallax]");
+    if (!progressEl) return;
     let ticking = false;
     const update = () => {
       ticking = false;
-      const y = scrollY;
-      if (progressEl) {
-        const max = document.documentElement.scrollHeight - innerHeight;
-        progressEl.style.transform = `scaleX(${max > 0 ? Math.min(y / max, 1) : 0})`;
-      }
-      if (y < innerHeight * 1.2) layers.forEach((l) => {
-        l.style.transform = `translate3d(0, ${(y * +l.dataset.parallax).toFixed(1)}px, 0)`;
-      });
+      const max = root.scrollHeight - innerHeight;
+      progressEl.style.transform = `scaleX(${max > 0 ? Math.min(scrollY / max, 1) : 0})`;
     };
     addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
     addEventListener("resize", update);
     update();
-  }
-
-  /* ---------- Count up ---------- */
-  function countUp(el, dur = 1600) {
-    const end = +el.dataset.count, pre = el.dataset.prefix || "", suf = el.dataset.suffix || "";
-    if (reduce) return;
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
-      io.disconnect();
-      const t0 = performance.now();
-      const tick = (t) => {
-        const p = Math.min((t - t0) / dur, 1);
-        el.textContent = pre + Math.round(end * (1 - Math.pow(1 - p, 3))) + suf;
-        if (p < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    }, { threshold: 0.6 });
-    io.observe(el);
   }
 
   /* ---------- Sliding tab indicator ---------- */
@@ -157,7 +171,7 @@ window.Motion = (() => {
   }
 
   /* ---------- FLIP: animate items to their new grid positions ---------- */
-  function flip(items, mutate, { duration = 450, easing = "cubic-bezier(.2,.8,.2,1)" } = {}) {
+  function flip(items, mutate, { duration = 600, easing = "cubic-bezier(.16,1,.3,1)" } = {}) {
     if (reduce) { mutate(); return; }
     const first = new Map(items.filter((el) => !el.hidden).map((el) => [el, el.getBoundingClientRect()]));
     mutate();
@@ -170,21 +184,27 @@ window.Motion = (() => {
         if (dx || dy) el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration, easing });
       } else {
         el.animate(
-          [{ opacity: 0, transform: "translateY(12px) scale(.97)" }, { opacity: 1, transform: "none" }],
-          { duration, easing, delay: Math.min(i, 8) * 30, fill: "backwards" }
+          [{ opacity: 0, transform: "translateY(16px) scale(.97)" }, { opacity: 1, transform: "none" }],
+          { duration, easing, delay: Math.min(i, 8) * 35, fill: "backwards" }
         );
       }
     });
+    if (G) ScrollTrigger.refresh();
   }
 
   /* ---------- Bind everything declared in markup ---------- */
-  function bind(root = document) {
-    reveal(root);
-    $$("[data-split]", root).forEach(splitWords);
-    $$("[data-tilt]", root).forEach((el) => tilt(el));
-    $$("[data-magnetic]", root).forEach((el) => magnetic(el));
-    $$("[data-count]", root).forEach((el) => countUp(el));
+  function bind() {
+    reveals();
+    curtains();
+    parallax();
+    glows();
+    $$("[data-magnetic]").forEach((el) => magnetic(el));
+    if (G) {
+      // pinned and scrubbed scenes measure the page; measure again once fonts and images settle
+      document.fonts?.ready.then(() => ScrollTrigger.refresh());
+      addEventListener("load", () => ScrollTrigger.refresh());
+    }
   }
 
-  return { reduce, reveal, splitWords, tilt, magnetic, scrollFx, countUp, tabIndicator, flip, bind };
+  return { reduce, G, safe, reveals, countUp, hero, marquee, magnetic, scrollFx, tabIndicator, flip, bind };
 })();

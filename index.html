@@ -10,13 +10,15 @@
   <meta property="og:description" content="Hand-churned A2 Bilona Ghee and traditional organic foods from native Tamil Nadu farms.">
   <meta property="og:image" content="assets/img/ghee-dabba.jpg">
   <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+  <!-- set before first paint: CSS hides animated parts only while this class is on -->
+  <script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("motion");</script>
   <link rel="preload" as="image" href="assets/img/gopuram.webp" type="image/webp" media="(min-width: 921px)">
   <link rel="preload" as="image" href="assets/img/gopuram-1080.webp" type="image/webp" media="(max-width: 920px)">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/vendor/lenis/lenis.css">
-  <link rel="stylesheet" href="assets/css/styles.css?v=8">
+  <link rel="stylesheet" href="assets/css/styles.css?v=9">
 </head>
 <body>
 
@@ -29,7 +31,8 @@
     <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
-    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
     <symbol id="i-chat" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
@@ -53,18 +56,20 @@
       <span class="brand__text"><b>RANGAA ROOTS</b><small>Rooted in Tradition</small></span>
     </a>
     <nav class="nav__links" id="navLinks" aria-label="Primary">
-      <a href="#ghee">A2 Ghee</a>
-      <a href="#shop">Products</a>
-      <a href="#process">Bilona Process</a>
-      <a href="#trace">Traceability</a>
-      <a href="#story">Our Story</a>
+      <a href="#ghee" style="--i:0">A2 Ghee</a>
+      <a href="#shop" style="--i:1">Products</a>
+      <a href="#process" style="--i:2">Bilona Process</a>
+      <a href="#trace" style="--i:3">Traceability</a>
+      <a href="#story" style="--i:4">Our Story</a>
+      <span class="nav__ink" id="navInk" aria-hidden="true"></span>
     </nav>
     <div class="nav__actions">
       <a class="btn btn--primary btn--sm hide-sm" href="https://wa.me/919597927712" target="_blank" rel="noopener">
-        <svg class="ic"><use href="#i-chat"/></svg> WhatsApp
+        <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> WhatsApp
       </a>
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
-        <svg class="ic"><use href="#i-menu"/></svg>
+        <svg class="ic ic--menu" aria-hidden="true"><use href="#i-menu"/></svg>
+        <svg class="ic ic--close" aria-hidden="true"><use href="#i-close"/></svg>
       </button>
     </div>
   </div>
@@ -79,60 +84,30 @@
 
   <div class="hero__inner container">
     <div class="hero__copy">
-      <p class="eyebrow" data-reveal><span class="dot"></span> From the land of Srirangam · Farms of Tamil Nadu</p>
-      <h1 class="hero__title" data-split>
-        <span class="line">Rooted in Tradition.</span>
-        <em class="line">Golden in every spoon.</em>
+      <p class="eyebrow"><span class="dot"></span> From the land of Srirangam · Farms of Tamil Nadu</p>
+      <h1 class="hero__title">
+        <span class="line"><span class="line__i">Rooted in Tradition.</span></span>
+        <em class="line"><span class="line__i">Golden in every spoon.</span></em>
       </h1>
-      <p class="hero__lead" data-reveal>Hand-churned <strong>A2 Bilona Ghee</strong> from indigenous Kangayam &amp; Gir cows, with ancestral malts, herbal soups and heirloom grains. 100% natural, traceable to every batch.</p>
-      <div class="hero__cta" data-reveal>
-        <a class="btn btn--primary btn--lg" href="#ghee" data-magnetic>Discover A2 Ghee <svg class="ic"><use href="#i-arrow"/></svg></a>
+      <p class="hero__lead">Hand-churned <strong>A2 Bilona Ghee</strong> from indigenous Kangayam &amp; Gir cows, with ancestral malts, herbal soups and heirloom grains. 100% natural, traceable to every batch.</p>
+      <div class="hero__cta">
+        <a class="btn btn--primary btn--lg" href="#ghee" data-magnetic>Discover A2 Ghee <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a>
         <a class="btn btn--paper btn--lg" href="#shop" data-magnetic>Explore Products</a>
       </div>
-      <dl class="hero__stats" data-reveal>
+      <dl class="hero__stats">
         <div class="stat"><dt data-count="40" data-suffix="+">40+</dt><dd>Native desi cows</dd></div>
-        <div class="stat"><dt data-count="30" data-prefix="25–" data-suffix=" L">25–30 L</dt><dd>Milk for 1 L ghee</dd></div>
+        <div class="stat"><dt data-count="25,30" data-join="–" data-suffix=" L">25–30 L</dt><dd>Milk for 1 L ghee</dd></div>
         <div class="stat"><dt data-count="100" data-suffix="%">100%</dt><dd>Batch traceable</dd></div>
       </dl>
     </div>
-
-    <!-- Paper-stack emblem + 6 organic symbols -->
-    <div class="hero__visual">
-      <div class="stack" aria-hidden="true">
-        <span class="stack__sheet stack__sheet--lotus"></span>
-        <span class="stack__sheet stack__sheet--gold"></span>
-        <span class="stack__sheet stack__sheet--leaf"></span>
-      </div>
-      <div class="emblem">
-        <img src="assets/img/logo.svg" alt="" width="200" height="200">
-        <span class="emblem__name">Rangaa Roots</span>
-        <span class="emblem__tag">Rooted in Tradition</span>
-      </div>
-
-      <ul class="symbols" aria-label="Our organic promises">
-        <li class="sym" style="--i:0" data-pos="1"><span class="sym__icon"><svg class="ic"><use href="#i-leaf"/></svg></span><span class="sym__label">100% Organic</span></li>
-        <li class="sym" style="--i:1" data-pos="2"><span class="sym__icon"><svg class="ic"><use href="#i-drop"/></svg></span><span class="sym__label">A2 Desi Milk</span></li>
-        <li class="sym" style="--i:2" data-pos="3"><span class="sym__icon"><svg class="ic"><use href="#i-wheat"/></svg></span><span class="sym__label">Heirloom Grains</span></li>
-        <li class="sym" style="--i:3" data-pos="4"><span class="sym__icon"><svg class="ic"><use href="#i-sprout"/></svg></span><span class="sym__label">Chemical-Free</span></li>
-        <li class="sym" style="--i:4" data-pos="5"><span class="sym__icon"><svg class="ic"><use href="#i-shield"/></svg></span><span class="sym__label">Lab Verified</span></li>
-        <li class="sym" style="--i:5" data-pos="6"><span class="sym__icon"><svg class="ic"><use href="#i-pin"/></svg></span><span class="sym__label">Farm Traceable</span></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Paper-cut layers: each moves at its own scroll speed -->
-  <div class="papercut" aria-hidden="true">
-    <svg class="papercut__layer papercut__layer--1" data-parallax="0.18" viewBox="0 0 1440 200" preserveAspectRatio="none"><path d="M0 110 C 180 60, 320 140, 520 100 S 860 40, 1060 90 S 1320 150, 1440 80 V200 H0Z"/></svg>
-    <svg class="papercut__layer papercut__layer--2" data-parallax="0.1" viewBox="0 0 1440 200" preserveAspectRatio="none"><path d="M0 140 C 220 100, 380 170, 620 130 S 980 90, 1180 135 S 1380 160, 1440 120 V200 H0Z"/></svg>
-    <svg class="papercut__layer papercut__layer--3" viewBox="0 0 1440 200" preserveAspectRatio="none"><path d="M0 170 C 260 140, 460 190, 720 160 S 1140 140, 1440 165 V200 H0Z"/></svg>
   </div>
 </section>
 
 <!-- ============ MARQUEE ============ -->
-<div class="marquee" aria-hidden="true">
+<div class="marquee" id="marquee" aria-hidden="true">
   <div class="marquee__track">
-    <span>Bilona churned</span><i></i><span>Cauvery Delta</span><i></i><span>Jawadhu Hills</span><i></i><span>Kangayam &amp; Gir cows</span><i></i><span>Zero preservatives</span><i></i><span>Wood-pressed oils</span><i></i><span>Hosur, Tamil Nadu</span><i></i>
-    <span>Bilona churned</span><i></i><span>Cauvery Delta</span><i></i><span>Jawadhu Hills</span><i></i><span>Kangayam &amp; Gir cows</span><i></i><span>Zero preservatives</span><i></i><span>Wood-pressed oils</span><i></i><span>Hosur, Tamil Nadu</span><i></i>
+    <div class="marquee__group"><span>Bilona churned</span><i></i><span>Cauvery Delta</span><i></i><span>Jawadhu Hills</span><i></i><span>Kangayam &amp; Gir cows</span><i></i><span>Zero preservatives</span><i></i><span>Wood-pressed oils</span><i></i><span>Hosur, Tamil Nadu</span><i></i></div>
+    <div class="marquee__group"><span>Bilona churned</span><i></i><span>Cauvery Delta</span><i></i><span>Jawadhu Hills</span><i></i><span>Kangayam &amp; Gir cows</span><i></i><span>Zero preservatives</span><i></i><span>Wood-pressed oils</span><i></i><span>Hosur, Tamil Nadu</span><i></i></div>
   </div>
 </div>
 
@@ -341,9 +316,9 @@
 <script src="assets/vendor/gsap/gsap.min.js"></script>
 <script src="assets/vendor/gsap/ScrollTrigger.min.js"></script>
 <script src="assets/vendor/lenis/lenis.min.js"></script>
-<script src="assets/js/scroll.js?v=8"></script>
-<script src="assets/js/data.js?v=8"></script>
-<script src="assets/js/motion.js?v=8"></script>
-<script src="assets/js/main.js?v=8"></script>
+<script src="assets/js/scroll.js?v=9"></script>
+<script src="assets/js/data.js?v=9"></script>
+<script src="assets/js/motion.js?v=9"></script>
+<script src="assets/js/main.js?v=9"></script>
 </body>
 </html>

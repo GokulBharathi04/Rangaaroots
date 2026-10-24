@@ -27,22 +27,40 @@
   addEventListener("scroll", () => nav.classList.toggle("is-solid", scrollY > 40), { passive: true });
   nav.classList.toggle("is-solid", scrollY > 40);
 
-  menuBtn.addEventListener("click", () => {
-    const open = nav.classList.toggle("menu-open");
+  // full-screen menu on small screens; page scrolling pauses while it is open
+  const setMenu = (open) => {
+    nav.classList.toggle("menu-open", open);
     menuBtn.setAttribute("aria-expanded", open);
+    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    open ? window.Scroll.stop() : window.Scroll.start();
+  };
+  menuBtn.addEventListener("click", () => setMenu(!nav.classList.contains("menu-open")));
+  $$("#navLinks a").forEach((a) => a.addEventListener("click", () => setMenu(false)));
+  addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && nav.classList.contains("menu-open")) { setMenu(false); menuBtn.focus(); }
   });
-  $$("#navLinks a").forEach((a) => a.addEventListener("click", () => {
-    nav.classList.remove("menu-open");
-    menuBtn.setAttribute("aria-expanded", "false");
-  }));
+
+  // gold underline glides to the link of the section in view
+  const ink = $("#navInk");
+  const placeInk = () => {
+    const a = $("#navLinks a.is-active");
+    ink.style.setProperty("--o", a ? 1 : 0);
+    if (!a) return;
+    ink.style.setProperty("--x", a.offsetLeft + 14 + "px");
+    ink.style.setProperty("--w", a.offsetWidth - 28);
+  };
+  addEventListener("resize", placeInk);
 
   const sectionObs = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       if (!e.isIntersecting) return;
       $$("#navLinks a").forEach((a) => a.classList.toggle("is-active", a.getAttribute("href") === "#" + e.target.id));
+      placeInk();
     });
   }, { rootMargin: "-45% 0px -50% 0px" });
   ["ghee", "shop", "process", "trace", "story"].forEach((id) => sectionObs.observe(document.getElementById(id)));
+  // leaving all tracked sections (back to the hero) clears the underline
+  addEventListener("scroll", () => { if (scrollY < innerHeight * 0.5) { $$("#navLinks a").forEach((a) => a.classList.remove("is-active")); placeInk(); } }, { passive: true });
 
   /* ---------- Flagship ghee ---------- */
   $("#gheeSub").textContent = ghee.subtitle;
@@ -164,5 +182,7 @@
 
   /* ---------- Motion ---------- */
   M.bind();
+  M.hero();
+  M.marquee($("#marquee"));
   M.scrollFx({ progressEl: $("#progress") });
 })();
