@@ -180,6 +180,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 500; }
 .hero__bg {
   position: absolute; inset: 0; z-index: -3;
   background: url("../img/gopuram.jpg") right -2% top 24% / auto 115% no-repeat;
+  background-image: image-set(url("../img/gopuram.webp") type("image/webp"), url("../img/gopuram.jpg") type("image/jpeg"));
   filter: sepia(.2) saturate(.9);
   -webkit-mask-image: linear-gradient(90deg, transparent 28%, rgba(0, 0, 0, .6) 50%, #000 72%);
   mask-image: linear-gradient(90deg, transparent 28%, rgba(0, 0, 0, .6) 50%, #000 72%);
@@ -567,7 +568,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 500; }
   .menu-btn { display: grid; }
   .hero { padding-bottom: 130px; }
   .hero__inner { grid-template-columns: 1fr; gap: 56px; }
-  .hero__bg { background-position: 50% 0; background-size: cover; -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .55) 60%, transparent 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .55) 60%, transparent 100%); }
+  .hero__bg { background-image: image-set(url("../img/gopuram-1080.webp") type("image/webp"), url("../img/gopuram.jpg") type("image/jpeg")); background-position: 50% 0; background-size: cover; -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .55) 60%, transparent 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .55) 60%, transparent 100%); }
   .hero__veil { background: linear-gradient(180deg, rgba(242, 237, 228, .8) 0%, rgba(242, 237, 228, .88) 45%, var(--desk) 78%); }
   .hero__visual { width: min(100%, 440px); }
   .ghee__grid, .trace__grid, .story__grid { grid-template-columns: 1fr; }

@@ -54,7 +54,10 @@
   grid.innerHTML = products.map((p) => `
     <article class="card sheet" data-id="${p.id}" data-cat="${p.cat}" data-tilt>
       <div class="card__img">
-        <img src="assets/img/products/${p.img}" alt="${p.name}" loading="lazy" width="600" height="600">
+        <picture>
+          <source srcset="assets/img/products/${p.img.replace(/\.jpg$/, ".webp")}" type="image/webp">
+          <img src="assets/img/products/${p.img}" alt="${p.name}" loading="lazy" width="600" height="600">
+        </picture>
       </div>
       <div class="card__body">
         ${p.size ? `<span class="card__size">${p.size}</span>` : ""}
