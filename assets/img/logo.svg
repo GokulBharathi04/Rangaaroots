@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="lotusPink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E85D88"/>
+      <stop offset="100%" stop-color="#C22956"/>
+    </linearGradient>
+    <linearGradient id="leafGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#388E3C"/>
+      <stop offset="100%" stop-color="#143823"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle subtle warm cream -->
+  <circle cx="50" cy="50" r="48" fill="#FCFAF7" stroke="#C59B27" stroke-width="2"/>
+  <!-- Central Lotus Petal -->
+  <path d="M50 16 C43 28 41 45 50 58 C59 45 57 28 50 16 Z" fill="url(#lotusPink)"/>
+  <!-- Inner Side Petals -->
+  <path d="M46 25 C35 34 32 48 42 58 C45 47 48 35 46 25 Z" fill="#D84473"/>
+  <path d="M54 25 C65 34 68 48 58 58 C55 47 52 35 54 25 Z" fill="#D84473"/>
+  <!-- Outer Side Petals -->
+  <path d="M38 35 C26 44 26 56 36 62 C40 54 41 43 38 35 Z" fill="#C22956"/>
+  <path d="M62 35 C74 44 74 56 64 62 C60 54 59 43 62 35 Z" fill="#C22956"/>
+  <!-- Base Green Calyx / Leaves & Roots -->
+  <path d="M50 63 C36 63 26 58 24 64 C22 71 35 73 45 68 C47 75 53 75 55 68 C65 73 78 71 76 64 C74 58 64 63 50 63 Z" fill="url(#leafGreen)"/>
+  <!-- Root flourish / traditional curl -->
+  <path d="M50 67 C48 76 52 82 50 86 C48 83 45 80 47 74" stroke="#C59B27" stroke-width="2" stroke-linecap="round" fill="none"/>
+</svg>
