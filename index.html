@@ -14,11 +14,11 @@
   <script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("motion");</script>
   <link rel="preload" as="image" href="assets/img/gopuram.webp" type="image/webp" media="(min-width: 921px)">
   <link rel="preload" as="image" href="assets/img/gopuram-1080.webp" type="image/webp" media="(max-width: 920px)">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="assets/fonts/cormorant-garamond-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/cormorant-garamond-italic-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/manrope-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/vendor/lenis/lenis.css">
-  <link rel="stylesheet" href="assets/css/styles.css?v=9">
+  <link rel="stylesheet" href="assets/css/styles.css?v=18">
 </head>
 <body>
 
@@ -51,7 +51,7 @@
 <!-- ============ HEADER ============ -->
 <header class="nav" id="nav">
   <div class="nav__inner container">
-    <a class="brand" href="#top" aria-label="Rangaa Roots home">
+    <a class="brand" href="#top">
       <img src="assets/img/logo.svg" alt="" width="44" height="44">
       <span class="brand__text"><b>RANGAA ROOTS</b><small>Rooted in Tradition</small></span>
     </a>
@@ -79,7 +79,9 @@
 
 <!-- ============ HERO ============ -->
 <section class="hero" id="top">
-  <div class="hero__bg" id="heroBg" role="img" aria-label="The Rajagopuram of Sri Ranganathaswamy Temple, Srirangam"></div>
+  <div class="hero__media" id="heroMedia">
+    <div class="hero__bg" id="heroBg" role="img" aria-label="The Rajagopuram of Sri Ranganathaswamy Temple, Srirangam"></div>
+  </div>
   <div class="hero__veil"></div>
 
   <div class="hero__inner container">
@@ -116,7 +118,7 @@
   <div class="container ghee__grid">
     <div class="ghee__media">
       <div class="ghee__frame" data-glow data-parallax="6">
-        <div class="ghee__img" data-curtain><picture><source srcset="assets/img/ghee-dabba.webp" type="image/webp"><img src="assets/img/ghee-dabba.jpg" alt="A2 Bilona ghee, golden and granular, in a steel dabba" loading="lazy" width="1920" height="1280"></picture></div>
+        <div class="ghee__img" data-curtain><picture><source srcset="assets/img/ghee-dabba-800.webp 800w, assets/img/ghee-dabba.webp 1600w" sizes="(max-width: 920px) 92vw, 46vw" type="image/webp"><img src="assets/img/ghee-dabba.jpg" alt="A2 Bilona ghee, golden and granular, in a steel dabba" loading="lazy" width="1920" height="1280"></picture></div>
       </div>
       <figure class="ghee__inset" data-glow data-parallax="-22">
         <div class="ghee__img" data-curtain><picture><source srcset="assets/img/ghee-jar.webp" type="image/webp"><img src="assets/img/ghee-jar.jpg" alt="Clear glass jar of liquid golden ghee" loading="lazy" width="1280" height="960"></picture></div>
@@ -284,15 +286,15 @@
       <p class="footer__about">100% natural &amp; traceable foods from native Tamil Nadu farms.</p>
     </div>
     <div>
-      <h4>Products</h4>
+      <h3>Products</h3>
       <ul><li><a href="#ghee">A2 Bilona Ghee</a></li><li><a href="#shop">Functional Malts</a></li><li><a href="#shop">Herbal Soups</a></li><li><a href="#shop">Thokku &amp; Wellness</a></li></ul>
     </div>
     <div>
-      <h4>Visit</h4>
+      <h3>Visit</h3>
       <address id="footAddr"></address>
     </div>
     <div>
-      <h4>Contact</h4>
+      <h3>Contact</h3>
       <ul>
         <li><a href="tel:+919597927712">+91 95979 27712</a></li>
         <li><a href="mailto:info@rangaaroots.co.in">info@rangaaroots.co.in</a></li>
@@ -300,19 +302,19 @@
       </ul>
     </div>
   </div>
-  <p class="footer__mark container" aria-hidden="true">Rangaa Roots</p>
+  <div class="footer__mark container" data-mark="Rangaa Roots" aria-hidden="true"></div>
   <div class="container footer__base">
     <p>© <span id="year"></span> Rangaa Roots. All rights reserved.</p>
     <p class="credits">Photos: Srirangam Rajagopuram by N. Vivekananthamoorthy; ghee by Phadke09 &amp; Hartej.hundal. All CC BY-SA 4.0, via Wikimedia Commons.</p>
   </div>
 </footer>
 
-<script src="assets/vendor/gsap/gsap.min.js"></script>
-<script src="assets/vendor/gsap/ScrollTrigger.min.js"></script>
-<script src="assets/vendor/lenis/lenis.min.js"></script>
-<script src="assets/js/scroll.js?v=9"></script>
-<script src="assets/js/data.js?v=9"></script>
-<script src="assets/js/motion.js?v=9"></script>
-<script src="assets/js/main.js?v=9"></script>
+<script src="assets/vendor/gsap/gsap.min.js" defer></script>
+<script src="assets/vendor/gsap/ScrollTrigger.min.js" defer></script>
+<script src="assets/vendor/lenis/lenis.min.js" defer></script>
+<script src="assets/js/scroll.js?v=18" defer></script>
+<script src="assets/js/data.js?v=18" defer></script>
+<script src="assets/js/motion.js?v=18" defer></script>
+<script src="assets/js/main.js?v=18" defer></script>
 </body>
 </html>

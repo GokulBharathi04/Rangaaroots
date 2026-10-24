@@ -24,6 +24,24 @@ window.Motion = (() => {
   const showAll = () => root.classList.remove("motion");
   if (!G) showAll();
 
+  /* ---------- Arrival: one IntersectionObserver for every one-shot entrance ----------
+   * An entrance only needs to know when something arrives, which the browser reports
+   * without any layout work; ScrollTrigger is kept for what follows the scroll position
+   * (parallax, the pinned process). Elements arriving together with the same handler are
+   * handed over as one group, in page order, so the group can stagger. */
+  const arrivals = new Map();
+  const arrivalIO = G && new IntersectionObserver((entries) => {
+    const groups = new Map();
+    entries.filter((e) => e.isIntersecting).forEach(({ target }) => {
+      arrivalIO.unobserve(target);
+      (arrivals.get(target) || []).forEach((fn) => groups.set(fn, [...(groups.get(fn) || []), target]));
+      arrivals.delete(target);
+    });
+    groups.forEach((els, fn) => fn(els.sort((a, b) => (a.compareDocumentPosition(b) & 4 ? -1 : 1))));
+  }, { rootMargin: "0px 0px -12% 0px" });
+  // one element can carry several entrances (a ghee frame is both a curtain parent and a glow)
+  const onArrive = (el, fn) => { arrivals.set(el, [...(arrivals.get(el) || []), fn]); arrivalIO.observe(el); };
+
   /* Run a motion step; if it throws, fall back to the static page rather than leave things hidden. */
   const safe = (fn) => (...args) => {
     if (!G) return;
@@ -31,15 +49,13 @@ window.Motion = (() => {
   };
 
   /* ---------- Reveal: batched so things entering together stagger ---------- */
+  const revealGroup = (batch) => gsap.fromTo(batch,
+    { y: 40, opacity: 0 },
+    { y: 0, opacity: 1, duration: 1.15, ease: EASE, stagger: 0.09, overwrite: true, clearProps: "transform" });
   const reveals = safe((root = document) => {
-    const els = $$("[data-reveal]:not([data-revealed])", root);
-    els.forEach((el) => (el.dataset.revealed = ""));
-    ScrollTrigger.batch(els, {
-      start: "top 88%",
-      once: true,
-      onEnter: (batch) => gsap.fromTo(batch,
-        { y: 40, autoAlpha: 0 },
-        { y: 0, autoAlpha: 1, duration: 1.15, ease: EASE, stagger: 0.09, overwrite: true, clearProps: "transform" }),
+    $$("[data-reveal]:not([data-revealed])", root).forEach((el) => {
+      el.dataset.revealed = "";
+      onArrive(el, revealGroup);
     });
   });
 
@@ -47,11 +63,12 @@ window.Motion = (() => {
   const curtains = safe(() => {
     $$("[data-curtain]").forEach((frame) => {
       const pic = frame.firstElementChild;
-      // trigger on the parent: the frame itself starts translated a full height down
-      gsap.timeline({ scrollTrigger: { trigger: frame.parentElement, start: "top 85%", once: true } })
-        .fromTo(frame, { yPercent: 100, autoAlpha: 1 }, { yPercent: 0, duration: 1.4, ease: "expo.inOut" }, 0)
+      // built on arrival, so nothing is written to the page at start-up (CSS holds the
+      // frame at opacity 0 until then). Watch the parent: the frame itself moves.
+      onArrive(frame.parentElement, () => gsap.timeline()
+        .fromTo(frame, { yPercent: 100, opacity: 1 }, { yPercent: 0, duration: 1.4, ease: "expo.inOut" }, 0)
         .fromTo(pic, { yPercent: -100, scale: 1.15 }, { yPercent: 0, duration: 1.4, ease: "expo.inOut" }, 0)
-        .to(pic, { scale: 1, duration: 1.8, ease: EASE }, 0.9);
+        .to(pic, { scale: 1, duration: 1.8, ease: EASE }, 0.9));
     });
   });
 
@@ -69,7 +86,7 @@ window.Motion = (() => {
   /* ---------- Golden glow ---------- */
   const glows = safe(() => {
     $$("[data-glow]").forEach((el) => {
-      ScrollTrigger.create({ trigger: el, start: "top 75%", once: true, onEnter: () => el.classList.add("is-glowing") });
+      onArrive(el, () => el.classList.add("is-glowing"));
     });
   });
 
@@ -95,11 +112,11 @@ window.Motion = (() => {
     });
     el.replaceChildren(...inners.map((i) => i.parentElement));
     el.dataset.split = "";   // CSS shows the element from here on
-    gsap.fromTo(inners, { yPercent: 108 }, {
+    gsap.set(inners, { yPercent: 108 });
+    onArrive(el, () => gsap.to(inners, {
       yPercent: 0, duration: 1.3, ease: EASE, stagger: 0.12,
-      scrollTrigger: { trigger: el, start: "top 82%", once: true },
       onComplete: () => el.replaceChildren(...original),
-    });
+    }));
   });
 
   /* ---------- Count up (text is final in the DOM; a ghost keeps the box from resizing) ---------- */
@@ -122,21 +139,18 @@ window.Motion = (() => {
     gsap.to(o, { p: 1, duration: 2.2, delay, ease: "power3.out", onUpdate: () => (val.textContent = fmt(o.p)) });
   });
 
-  /* ---------- Hero entrance + temple parallax ---------- */
+  /* ---------- Hero: count-up and temple parallax ----------
+   * The entrance itself is CSS (styles.css, "hero entrance") so it starts on first paint.
+   * The stats fade in at about 1.3s; count up only if the script arrived in time to
+   * start from zero, otherwise leave the final values alone. */
   const hero = safe(() => {
-    const bg = $("#heroBg");
-    const tl = gsap.timeline({ defaults: { ease: EASE } });
-    tl.fromTo(bg, { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 2.6, ease: "power2.out" }, 0)
-      .fromTo(".hero .eyebrow", { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.1 }, 0.25)
-      .fromTo(".hero__title .line__i", { yPercent: 110, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 1.4, stagger: 0.16 }, 0.35)
-      .fromTo(".hero__lead", { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.3 }, 0.85)
-      .fromTo(".hero__cta .btn", { y: 18, scale: 0.94, autoAlpha: 0 }, { y: 0, scale: 1, autoAlpha: 1, duration: 1.2, stagger: 0.12 }, 1.05)
-      .fromTo(".hero__stats .stat", { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.2, stagger: 0.12 }, 1.25);
-    $$(".hero__stats [data-count]").forEach((el, i) => countUp(el, 1.3 + i * 0.12));
-
+    const elapsed = performance.now() / 1000;
+    if (elapsed < 1.2) {
+      $$(".hero__stats [data-count]").forEach((el, i) => countUp(el, 1.3 - elapsed + i * 0.12));
+    }
     // the temple drifts down at a fraction of scroll speed while the hero leaves; its
     // top edge only uncovers once that part of the hero is already off screen
-    gsap.to(bg, { yPercent: 14, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+    gsap.to("#heroMedia", { yPercent: 14, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
   });
 
   /* ---------- Bilona process: a gold line runs through five stages ----------
@@ -156,15 +170,16 @@ window.Motion = (() => {
       const tl = gsap.timeline({
         defaults: { ease: "power3.out" },
         scrollTrigger: {
-          trigger: section, start: () => `top ${header()}`, end: () => "+=" + innerHeight * 2.4,
+          trigger: section, start: () => `top ${header()}`, end: () => "+=" + innerHeight * 1.6,
           scrub: 1, pin: true, anticipatePin: 1, invalidateOnRefresh: true,
+          refreshPriority: 1,   // created after the reveals below it: measure the pin first so they include its length
         },
       });
       // stage i sits about i/5 along the line, so it lights up at time i
       tl.fromTo(fill, { scaleX: 0 }, { scaleX: 1, ease: "none", duration: steps.length }, 0);
       steps.forEach((s, i) => {
         tl.fromTo(dot(s), { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2)" }, i + 0.02)
-          .fromTo(parts(s), { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.6, stagger: 0.08 }, i + 0.05);
+          .fromTo(parts(s), { y: 48, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.08 }, i + 0.05);
       });
       tl.to({}, { duration: 0.6 });   // a short hold on the finished line before the pin releases
       return () => section.classList.remove("is-pinnable");
@@ -177,25 +192,31 @@ window.Motion = (() => {
         scrollTrigger: { trigger: $(".process__track", section), start: "top 75%", end: "bottom 65%", scrub: 0.6 },
       });
       steps.forEach((s) => {
-        gsap.timeline({ scrollTrigger: { trigger: s, start: "top 82%", once: true } })
-          .fromTo(dot(s), { scale: 0 }, { scale: 1, duration: 0.5, ease: "back.out(2)" }, 0)
-          .fromTo(parts(s), { y: 32, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1, ease: EASE, stagger: 0.08 }, 0.1);
+        gsap.set(dot(s), { scale: 0 });
+        gsap.set(parts(s), { y: 32, opacity: 0 });
+        onArrive(s, () => gsap.timeline()
+          .to(dot(s), { scale: 1, duration: 0.5, ease: "back.out(2)" }, 0)
+          .to(parts(s), { y: 0, opacity: 1, duration: 1, ease: EASE, stagger: 0.08 }, 0.1));
       });
     });
   });
 
-  /* ---------- Marquee: steady drift, speeds up with scroll velocity, eases to a stop on hover ---------- */
+  /* ---------- Marquee: steady drift, speeds up with scroll velocity, eases to a stop on hover ----------
+   * The drift is a CSS animation, so it runs on the compositor with no per-frame work on the
+   * main thread; GSAP only eases its playbackRate when the visitor scrolls or hovers. */
   const marquee = safe((el) => {
-    const track = $(".marquee__track", el);
-    const loop = gsap.to(track, { xPercent: -50, duration: 55, ease: "none", repeat: -1 });
+    const loop = $(".marquee__track", el).getAnimations()[0];
+    if (!loop) return;
+    const rate = { v: 1 };
+    const apply = () => (loop.playbackRate = rate.v);
     let hovering = false;
-    const ease = (to, d = 0.8) => gsap.to(loop, { timeScale: to, duration: d, ease: "power2.out", overwrite: true });
+    const ease = (to, d) => gsap.to(rate, { v: to, duration: d, ease: "power2.out", overwrite: true, onUpdate: apply });
     el.addEventListener("pointerenter", () => { hovering = true; ease(0, 1); });
     el.addEventListener("pointerleave", () => { hovering = false; ease(1, 1.2); });
     window.Scroll.lenis?.on("scroll", ({ velocity }) => {
       if (hovering) return;
-      gsap.to(loop, { timeScale: 1 + Math.min(Math.abs(velocity) * 0.25, 4), duration: 0.25, overwrite: true });
-      gsap.to(loop, { timeScale: 1, duration: 1.2, delay: 0.25, ease: "power2.out" });
+      gsap.to(rate, { v: 1 + Math.min(Math.abs(velocity) * 0.25, 4), duration: 0.25, overwrite: true, onUpdate: apply });
+      gsap.to(rate, { v: 1, duration: 1.2, delay: 0.25, ease: "power2.out", onUpdate: apply });
     });
   });
 
@@ -218,15 +239,18 @@ window.Motion = (() => {
   /* ---------- Reading progress bar ---------- */
   function scrollFx({ progressEl } = {}) {
     if (!progressEl) return;
-    let ticking = false;
+    // the scrollable height is cached and re-read only when the page resizes: reading it
+    // per frame would force a layout right after GSAP's per-frame style writes
+    let max = 0, ticking = false;
+    const measure = () => { max = root.scrollHeight - innerHeight; update(); };
     const update = () => {
       ticking = false;
-      const max = root.scrollHeight - innerHeight;
       progressEl.style.transform = `scaleX(${max > 0 ? Math.min(scrollY / max, 1) : 0})`;
     };
     addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-    addEventListener("resize", update);
-    update();
+    new ResizeObserver(measure).observe(document.body);
+    addEventListener("resize", measure);
+    measure();
   }
 
   /* ---------- Sliding tab indicator ---------- */
@@ -235,8 +259,10 @@ window.Motion = (() => {
       const a = container.querySelector(activeSel);
       if (!a) return;
       if (instant) indicator.style.transition = "none";
+      // tabs may wrap onto two rows on phones, so follow the active tab's row as well
       indicator.style.width = a.offsetWidth + "px";
-      indicator.style.transform = `translateX(${a.offsetLeft}px)`;
+      indicator.style.height = a.offsetHeight + "px";
+      indicator.style.transform = `translate(${a.offsetLeft}px, ${a.offsetTop}px)`;
       if (instant) requestAnimationFrame(() => (indicator.style.transition = ""));
     };
     addEventListener("resize", () => place(true));
@@ -267,20 +293,35 @@ window.Motion = (() => {
     if (G) ScrollTrigger.refresh();
   }
 
+  /* ---------- Start-up: run set-up steps one per task ----------
+   * Each step measures the page; run back to back they make one long task that blocks
+   * taps on a slow phone. A macrotask between steps lets the browser respond in between. */
+  function run(steps) {
+    const next = () => {
+      const step = steps.shift();
+      if (!step) return;
+      step();
+      if (steps.length) setTimeout(next, 0);
+    };
+    next();
+  }
+
   /* ---------- Bind everything declared in markup ---------- */
-  function bind() {
-    reveals();
-    curtains();
-    parallax();
-    glows();
-    $$("[data-magnetic]").forEach((el) => magnetic(el));
-    // line breaks depend on the loaded fonts, so split only once they are in
-    (document.fonts?.ready || Promise.resolve()).then(() => $$("[data-lines]").forEach((el) => lines(el)));
-    if (G) {
-      // pinned and scrubbed scenes measure the page; measure again once fonts and images settle
-      document.fonts?.ready.then(() => ScrollTrigger.refresh());
-      addEventListener("load", () => ScrollTrigger.refresh());
-    }
+  function bind(extra = []) {
+    run([
+      ...extra,
+      () => reveals(),
+      () => curtains(),
+      () => parallax(),
+      () => glows(),
+      () => $$("[data-magnetic]").forEach((el) => magnetic(el)),
+      // line breaks depend on the loaded fonts, so split only once they are in.
+      // ScrollTrigger refreshes itself on load; refresh once more if fonts land after that.
+      () => (document.fonts?.ready || Promise.resolve()).then(() => {
+        $$("[data-lines]").forEach((el) => lines(el));
+        if (G && document.readyState === "complete") ScrollTrigger.refresh();
+      }),
+    ]);
   }
 
   return { reduce, G, safe, reveals, countUp, hero, process, marquee, magnetic, scrollFx, tabIndicator, flip, bind };

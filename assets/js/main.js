@@ -60,7 +60,11 @@
   }, { rootMargin: "-45% 0px -50% 0px" });
   ["ghee", "shop", "process", "trace", "story"].forEach((id) => sectionObs.observe(document.getElementById(id)));
   // leaving all tracked sections (back to the hero) clears the underline
-  addEventListener("scroll", () => { if (scrollY < innerHeight * 0.5) { $$("#navLinks a").forEach((a) => a.classList.remove("is-active")); placeInk(); } }, { passive: true });
+  addEventListener("scroll", () => {
+    if (scrollY >= innerHeight * 0.5) return;
+    const active = $("#navLinks a.is-active");
+    if (active) { active.classList.remove("is-active"); placeInk(); }
+  }, { passive: true });
 
   /* ---------- Flagship ghee ---------- */
   $("#gheeSub").textContent = ghee.subtitle;
@@ -73,7 +77,8 @@
     <article class="card" data-id="${p.id}" data-cat="${p.cat}">
       <div class="card__img">
         <picture>
-          <source srcset="assets/img/products/${p.img.replace(/\.jpg$/, ".webp")}" type="image/webp">
+          <source srcset="assets/img/products/${p.img.replace(/\.jpg$/, "-480.webp")} 480w, assets/img/products/${p.img.replace(/\.jpg$/, ".webp")} 900w"
+            sizes="(max-width: 600px) 46vw, (max-width: 1080px) 31vw, 300px" type="image/webp">
           <img src="assets/img/products/${p.img}" alt="${p.name}" loading="lazy" width="600" height="600">
         </picture>
       </div>
@@ -103,7 +108,7 @@
   const chips = $("#chips");
   chips.insertAdjacentHTML("beforeend", categories.map((c) =>
     `<button type="button" class="chip" role="tab" data-cat="${c.id}" aria-selected="${c.id === activeCat}">${c.label}</button>`).join(""));
-  const placeIndicator = M.tabIndicator(chips, $("#chipIndicator"));
+  let placeIndicator = () => {};   // set once every section is rendered (see below)
 
   const applyFilter = () => {
     const q = query.trim().toLowerCase();
@@ -180,10 +185,15 @@
   $("#footAddr").textContent = brand.address;
   $("#year").textContent = new Date().getFullYear();
 
+  // first measurement only after all the content above is in, so the page is laid out once
+  placeIndicator = M.tabIndicator(chips, $("#chipIndicator"));
+
   /* ---------- Motion ---------- */
-  M.bind();
-  M.hero();
-  M.marquee($("#marquee"));
-  M.process($("#process"));
+  // hero first (it is on screen), then the rest one step per task
+  M.bind([
+    () => M.hero(),
+    () => M.marquee($("#marquee")),
+    () => M.process($("#process")),
+  ]);
   M.scrollFx({ progressEl: $("#progress") });
 })();
