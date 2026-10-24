@@ -213,21 +213,21 @@
 <!-- ============ TRACEABILITY ============ -->
 <section class="section trace" id="trace">
   <div class="container trace__grid">
-    <div data-reveal>
-      <p class="eyebrow">Know Your Food</p>
-      <h2 class="h2">Trace any jar back to its farm</h2>
-      <p class="muted">Enter the batch number printed on your pack to see where it was grown, how it was processed and when it was packed.</p>
-      <form class="trace__form" id="traceForm">
+    <div class="trace__copy">
+      <p class="eyebrow" data-reveal>Know Your Food</p>
+      <h2 class="h2" data-reveal>Trace any jar back to its farm</h2>
+      <p class="trace__lead" data-reveal>Enter the batch number printed on your pack to see where it was grown, how it was processed and when it was packed.</p>
+      <form class="trace__form" id="traceForm" data-reveal>
         <label class="sr-only" for="traceInput">Batch number</label>
         <input id="traceInput" placeholder="e.g. RR-URAD-2026-004" autocomplete="off" spellcheck="false">
         <button class="btn btn--primary" type="submit">Trace</button>
       </form>
-      <p class="trace__try">Try: <span id="traceSamples"></span></p>
+      <p class="trace__try" data-reveal>Try: <span id="traceSamples"></span></p>
     </div>
-    <div class="trace__tag" data-reveal>
-      <div class="sheet trace__card" id="traceResult" aria-live="polite">
+    <div class="trace__cert" data-reveal>
+      <div class="trace__card" id="traceResult" aria-live="polite">
         <div class="trace__placeholder">
-          <svg class="ic"><use href="#i-pin"/></svg>
+          <svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>
           <p>Your batch story will appear here.</p>
         </div>
       </div>
@@ -238,30 +238,26 @@
 <!-- ============ REVIEWS ============ -->
 <section class="section reviews">
   <div class="container">
-    <header class="section__head" data-reveal>
-      <p class="eyebrow">Loved across South India</p>
-      <h2 class="h2">From families who taste the difference</h2>
+    <header class="section__head">
+      <p class="eyebrow eyebrow--light" data-reveal>Loved across South India</p>
+      <h2 class="h2" data-reveal>From families who taste the difference</h2>
     </header>
-    <div class="reviews__row" id="reviews" data-stagger></div>
+    <div class="reviews__row" id="reviews"></div>
   </div>
 </section>
 
 <!-- ============ STORY ============ -->
 <section class="section story" id="story">
   <div class="container story__grid">
-    <figure class="story__photo" data-reveal>
-      <div class="print" data-tilt>
-        <span class="tape tape--l" aria-hidden="true"></span>
-        <span class="tape tape--r" aria-hidden="true"></span>
-        <picture><source srcset="assets/img/products/founder-g-aswin.webp" type="image/webp"><img src="assets/img/products/founder-g-aswin.jpg" alt="G. Aswin, founder of Rangaa Roots" loading="lazy" width="806" height="1024"></picture>
-        <figcaption>G. Aswin · Founder</figcaption>
-      </div>
+    <figure class="story__photo">
+      <div class="story__frame" data-curtain><picture><source srcset="assets/img/products/founder-g-aswin.webp" type="image/webp"><img src="assets/img/products/founder-g-aswin.jpg" alt="G. Aswin, founder of Rangaa Roots" loading="lazy" width="806" height="1024" data-parallax="8"></picture></div>
+      <figcaption data-reveal>G. Aswin · Founder</figcaption>
     </figure>
-    <div data-reveal>
-      <p class="eyebrow">Our Story</p>
-      <blockquote class="story__quote">“My grandparents taught me that real food is medicine, made slowly with patience. I started Rangaa Roots to bring that same slow-made taste and healing wisdom to the world, now proven by science.”</blockquote>
-      <p class="story__by"><b>G. Aswin</b><br>Founder &amp; Scientific Head · B.Tech Biotechnology, R&amp;D Scientist</p>
-      <p class="muted">From the grandparents' kitchen to the R&amp;D lab: every recipe is validated with modern analytical phytochemistry before it reaches your table.</p>
+    <div class="story__copy">
+      <p class="eyebrow" data-reveal>Our Story</p>
+      <blockquote class="story__quote" data-lines>“My grandparents taught me that real food is medicine, made slowly with patience. I started Rangaa Roots to bring that same slow-made taste and healing wisdom to the world, now proven by science.”</blockquote>
+      <p class="story__by" data-reveal><b>G. Aswin</b><br>Founder &amp; Scientific Head · B.Tech Biotechnology, R&amp;D Scientist</p>
+      <p class="story__note" data-reveal>From the grandparents' kitchen to the R&amp;D lab: every recipe is validated with modern analytical phytochemistry before it reaches your table.</p>
     </div>
   </div>
 </section>

@@ -73,6 +73,35 @@ window.Motion = (() => {
     });
   });
 
+  /* ---------- Line reveal: each rendered line rises from behind its own mask ----------
+   * Lines are measured after fonts load; once the reveal finishes the original nodes go
+   * back, so later resizes re-wrap the text naturally. */
+  const lines = safe((el) => {
+    const original = [...el.childNodes];
+    const words = el.textContent.trim().split(/\s+/);
+    const probes = words.map((w) => Object.assign(document.createElement("span"), { textContent: w, style: "display:inline-block" }));
+    el.replaceChildren(...probes.flatMap((p, i) => (i ? [" ", p] : [p])));
+    const rows = [];
+    let top = null;
+    probes.forEach((p) => {
+      if (p.offsetTop !== top) { rows.push([]); top = p.offsetTop; }
+      rows[rows.length - 1].push(p.textContent);
+    });
+    const inners = rows.map((row) => {
+      const mask = Object.assign(document.createElement("span"), { className: "ln" });
+      const inner = Object.assign(document.createElement("span"), { className: "ln__i", textContent: row.join(" ") });
+      mask.append(inner);
+      return inner;
+    });
+    el.replaceChildren(...inners.map((i) => i.parentElement));
+    el.dataset.split = "";   // CSS shows the element from here on
+    gsap.fromTo(inners, { yPercent: 108 }, {
+      yPercent: 0, duration: 1.3, ease: EASE, stagger: 0.12,
+      scrollTrigger: { trigger: el, start: "top 82%", once: true },
+      onComplete: () => el.replaceChildren(...original),
+    });
+  });
+
   /* ---------- Count up (text is final in the DOM; a ghost keeps the box from resizing) ---------- */
   function prepCount(el) {
     const ends = el.dataset.count.split(",").map(Number);
@@ -245,6 +274,8 @@ window.Motion = (() => {
     parallax();
     glows();
     $$("[data-magnetic]").forEach((el) => magnetic(el));
+    // line breaks depend on the loaded fonts, so split only once they are in
+    (document.fonts?.ready || Promise.resolve()).then(() => $$("[data-lines]").forEach((el) => lines(el)));
     if (G) {
       // pinned and scrubbed scenes measure the page; measure again once fonts and images settle
       document.fonts?.ready.then(() => ScrollTrigger.refresh());

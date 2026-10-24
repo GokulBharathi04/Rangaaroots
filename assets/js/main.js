@@ -169,9 +169,8 @@
 
   /* ---------- Reviews (paper notes) ---------- */
   $("#reviews").innerHTML = reviews.map((r, i) => `
-    <article class="review sheet" data-reveal data-tilt style="--rot:${[-1.2, 0.8, -0.6, 1.1][i % 4]}deg">
-      <span class="tape" aria-hidden="true"></span>
-      <span class="stars" aria-label="5 out of 5 stars">${icon("star").repeat(5)}</span>
+    <article class="review" data-reveal>
+      <span class="stars" role="img" aria-label="5 out of 5 stars">${icon("star").repeat(5)}</span>
       <h3>${r.title}</h3>
       <p>“${r.text}”</p>
       <footer><span class="avatar" aria-hidden="true">${r.name.replace(/^S\. /, "")[0]}</span><span><b>${r.name}</b>${r.place}</span></footer>
