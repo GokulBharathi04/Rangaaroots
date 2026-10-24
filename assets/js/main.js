@@ -70,7 +70,7 @@
   /* ---------- Products: render once, filter with FLIP ---------- */
   const grid = $("#grid");
   grid.innerHTML = products.map((p) => `
-    <article class="card sheet" data-id="${p.id}" data-cat="${p.cat}" data-tilt>
+    <article class="card" data-id="${p.id}" data-cat="${p.cat}">
       <div class="card__img">
         <picture>
           <source srcset="assets/img/products/${p.img.replace(/\.jpg$/, ".webp")}" type="image/webp">
@@ -87,14 +87,15 @@
       </div>
     </article>`).join("");
   const cards = $$(".card", grid);
-  // first appearance: each row of cards rises in sequence
+  // first appearance: each row of cards rises in sequence. Cards are never hidden by CSS,
+  // so one filtered out before it was seen still shows normally when it comes back.
   if (!M.reduce) {
     const cardIO = new IntersectionObserver((entries) => entries.forEach((e) => {
       if (!e.isIntersecting) return;
       cardIO.unobserve(e.target);
-      e.target.animate([{ opacity: 0, translate: "0 14px" }, { opacity: 1, translate: "0 0" }],
-        { duration: 600, easing: "cubic-bezier(.2,.8,.2,1)", delay: (cards.indexOf(e.target) % 4) * 70, fill: "backwards" });
-    }), { threshold: 0.15 });
+      e.target.animate([{ opacity: 0, translate: "0 40px" }, { opacity: 1, translate: "0 0" }],
+        { duration: 1100, easing: "cubic-bezier(.16,1,.3,1)", delay: (cards.indexOf(e.target) % 4) * 90, fill: "backwards" });
+    }), { threshold: 0.12 });
     cards.forEach((c) => cardIO.observe(c));
   }
 
