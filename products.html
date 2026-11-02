@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>All Products | Rangaa Roots</title>
+  <meta name="description" content="The full Rangaa Roots range: A2 Bilona ghee, natural sweeteners, health mixes, thokku, herbal soup blends, millets and heritage rice, and herbal hair and skin care.">
+  <meta name="theme-color" content="#143823">
+  <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+  <script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("motion");</script>
+  <link rel="preload" href="assets/fonts/oswald-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/manrope-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/styles.css?v=25">
+  <link rel="stylesheet" href="assets/css/products.css?v=1">
+</head>
+<body class="page-products">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="1.2"/></symbol>
+  </defs>
+</svg>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav is-solid" id="nav">
+  <div class="nav__inner container">
+    <a class="brand" href="index.html">
+      <img src="assets/img/logo.svg" alt="" width="44" height="44">
+      <span class="brand__text"><b>RANGAA ROOTS</b><small>Rooted in Tradition</small></span>
+    </a>
+    <nav class="nav__links" id="navLinks" aria-label="Primary">
+      <a href="index.html" style="--i:0">Home</a>
+      <a href="index.html#ghee" style="--i:1">A2 Ghee</a>
+      <a href="products.html" class="is-active" aria-current="page" style="--i:2">All Products</a>
+      <a href="films/index.html#downloads" style="--i:3">Films &amp; downloads</a>
+      <a href="index.html#story" style="--i:4">Our Story</a>
+    </nav>
+    <div class="nav__actions">
+      <a class="btn btn--primary btn--sm hide-sm" href="https://wa.me/919597927712" target="_blank" rel="noopener">
+        <svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg> WhatsApp
+      </a>
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <svg class="ic ic--menu" aria-hidden="true"><use href="#i-menu"/></svg>
+        <svg class="ic ic--close" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="pl-hero container">
+    <p class="eyebrow"><span class="dot"></span>The full pantry</p>
+    <h1 class="pl-hero__title">Thirty-five foods,<br><em>rooted in tradition.</em></h1>
+    <p class="pl-hero__lead">Every Rangaa Roots product, grouped by family. Open any label to see the artwork up close or download it for print.</p>
+  </section>
+
+  <nav class="pl-families" aria-label="Product families">
+    <div class="pl-families__track container" id="familyNav"></div>
+  </nav>
+
+  <div class="container" id="listing"></div>
+</main>
+
+<dialog class="pl-label" id="labelDialog" aria-labelledby="labelTitle">
+  <div class="pl-label__head">
+    <div>
+      <p class="eyebrow" id="labelFamily"></p>
+      <h2 class="pl-label__title" id="labelTitle"></h2>
+    </div>
+    <button class="icon-btn" id="labelClose" aria-label="Close label"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="pl-label__art" id="labelArt"></div>
+  <div class="pl-label__foot">
+    <p class="pl-label__meta" id="labelMeta"></p>
+    <button class="btn btn--primary btn--sm" id="labelDownload"><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg> Download SVG</button>
+  </div>
+</dialog>
+
+<footer class="footer">
+  <div class="container footer__base">
+    <p>© <span id="year"></span> Rangaa Roots. All rights reserved.</p>
+    <p class="credits">Label artwork generated from the Rangaa Roots A2 Cow Ghee and Coconut Sugar labels. Sizes and copy are drafts for review.</p>
+  </div>
+</footer>
+
+<script src="assets/js/catalog.js?v=1" defer></script>
+<script src="assets/js/labels.js?v=1" defer></script>
+<script src="assets/js/products-page.js?v=1" defer></script>
+</body>
+</html>

@@ -87,6 +87,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 500; }
   --fs-small: .875rem;
   --fs-label: .8125rem;
   --ease-lux: cubic-bezier(.16, 1, .3, 1);   /* expo-out: long, soft landing */
+  --ease-in-out: cubic-bezier(.77, 0, .175, 1);   /* strong ease-in-out: things moving on screen */
 }
 .eyebrow {
   display: inline-flex; align-items: flex-start; gap: 12px; line-height: 1.6;
@@ -284,22 +285,18 @@ html.motion .hero__stats .stat:nth-child(3) { animation-delay: 1.49s; }
 
 /* ---------- Ghee — two prints at uneven sizes ---------- */
 .ghee__grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(48px, 8vw, 120px); align-items: center; }
-.ghee__media { position: relative; padding: 0 12% 18% 0; }
-.ghee__frame, .ghee__inset { position: relative; margin: 0; }
+.ghee__media { position: relative; }
+.ghee__frame { position: relative; margin: 0; }
 .ghee__img { overflow: hidden; }
 .ghee__img img { width: 100%; object-fit: cover; }
-.ghee__frame .ghee__img img { aspect-ratio: 4 / 5; object-position: 55% 60%; filter: sepia(.28) saturate(1.35) hue-rotate(-10deg) brightness(1.04); }
-.ghee__inset { position: absolute; right: 0; bottom: 0; width: 46%; z-index: 1; }
-.ghee__inset .ghee__img { outline: 10px solid var(--desk); }
-.ghee__inset img { aspect-ratio: 1; object-position: 30% 50%; }
 /* slow golden light: opacity-only, swells once on entry then breathes */
-.ghee__frame::after, .ghee__inset::after {
+.ghee__frame::after {
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   box-shadow: 0 40px 90px -30px rgba(197, 155, 39, .75), 0 0 60px -10px rgba(197, 155, 39, .35);
   opacity: 0; transition: opacity 2.6s var(--ease-lux);
 }
-.ghee__frame.is-glowing::after, .ghee__inset.is-glowing::after { opacity: 1; animation: breathe 6s ease-in-out 2.6s infinite alternate; }
-html:not(.motion) .ghee__frame::after, html:not(.motion) .ghee__inset::after { opacity: .8; }
+.ghee__frame.is-glowing::after { opacity: 1; animation: breathe 6s ease-in-out 2.6s infinite alternate; }
+html:not(.motion) .ghee__frame::after { opacity: .8; }
 .ghee__seal {
   position: absolute; left: -5%; top: 6%; z-index: 2;
   width: 124px; height: 124px; border-radius: 50%;
@@ -317,6 +314,88 @@ html:not(.motion) .ghee__frame::after, html:not(.motion) .ghee__inset::after { o
 .fact { display: flex; gap: 24px; align-items: center; margin-top: 48px; padding: 4px 0 4px 24px; border-left: 2px solid var(--gold); color: var(--ink-soft); font-size: var(--fs-small); line-height: 1.65; }
 .fact b { font-family: var(--font-display); font-size: clamp(2.5rem, 2rem + 1.6vw, 3.5rem); font-weight: 500; line-height: 1; color: var(--forest); white-space: nowrap; font-variant-numeric: lining-nums; }
 @keyframes breathe { from { opacity: 1; } to { opacity: .55; } }
+
+/* ---------- Ghee jar: the product photo, filled and sealed ----------
+   Layers cut from the photo (assets/img/jar) stack on one 582x644 canvas. Without motion
+   (reduced motion, no script) only the untouched photo shows. Under html.motion each part
+   holds its first keyframe until motion.js adds .is-playing on arrival, then it plays once:
+   stream 0s, fill 0.2-3.6s, stream ends 3.5s, lid 3.9s, screwed down 4.45s, photo 5.35s.
+   Positions are % of the canvas, measured from the photo (lid box, rim at 10.6%, label
+   top at 27.4%, mouth on the lid's centre line at 53.5%). */
+.jar { position: relative; aspect-ratio: 582 / 644; overflow: hidden; background: var(--kraft); }
+.jar__layer, .jar__layer img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.jar__empty, .jar__full, .jar__level, .jar__pour, .jar__cap { display: none; }
+html.motion .jar :is(.jar__empty, .jar__full, .jar__level, .jar__pour, .jar__cap) { display: block; }
+
+/* the stream: amber with a lit core; inside the glass (below the rim) it shows through at reduced strength */
+.jar__pour {
+  position: absolute; left: 53.5%; top: 0; width: 1.6%; height: 27.4%; margin-left: -.8%;
+  border-radius: 0 0 40% 40%; overflow: hidden;
+  background: linear-gradient(90deg, rgba(122, 90, 16, .9), var(--gold) 30%, rgba(252, 250, 247, .75) 48%, var(--gold) 66%, rgba(122, 90, 16, .9));
+  -webkit-mask-image: linear-gradient(180deg, #000 0 38%, rgba(0, 0, 0, .5) 40%, rgba(0, 0, 0, .5) 100%);
+  mask-image: linear-gradient(180deg, #000 0 38%, rgba(0, 0, 0, .5) 40%, rgba(0, 0, 0, .5) 100%);
+  transform-origin: 50% 0;
+}
+/* streaks running down the stream so it reads as flowing */
+.jar__pour::before {
+  content: ""; position: absolute; inset: -100% 0 0;
+  background: repeating-linear-gradient(180deg, transparent 0 14px, rgba(252, 250, 247, .28) 14px 18px, transparent 18px 30px);
+}
+/* the ghee line as it rises: a thin lit edge where the surface meets the glass */
+.jar__level { position: absolute; inset: 0; pointer-events: none; }
+.jar__level::before {
+  content: ""; position: absolute; left: 16%; right: 9%; top: 0; height: 2px;
+  background: rgba(252, 250, 247, .55); box-shadow: 0 0 6px rgba(197, 155, 39, .8);
+}
+.jar__cap { position: absolute; left: 14.09%; top: 0; width: 78.87%; height: 14.29%; }
+.jar__cap img { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* the sheen is cut to the lid's own shape, so it can only ever light the lid */
+.jar__sheen {
+  position: absolute; inset: 0; overflow: hidden;
+  -webkit-mask: url("../img/jar/jar-lid.webp") center / 100% 100% no-repeat;
+  mask: url("../img/jar/jar-lid.webp") center / 100% 100% no-repeat;
+}
+.jar__sheen::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 28%;
+  background: linear-gradient(90deg, transparent, rgba(252, 250, 247, .5), transparent);
+  transform: translateX(-120%);
+}
+
+html.motion .jar__full { animation: jarFill 3.4s linear .2s both; }
+html.motion .jar__level { animation: jarLevel 3.4s linear .2s both; }
+html.motion .jar__pour { animation: pourOn .35s var(--ease-lux) both, pourOff .3s var(--ease-lux) 3.5s forwards; }
+html.motion .jar__pour::before { animation: flow .45s linear 8; }   /* only while the stream runs */
+html.motion .jar__cap { animation: lidOn .55s var(--ease-lux) 3.9s both; }
+html.motion .jar__sheen::before { animation: screw .45s var(--ease-in-out) 4.45s 2 both; }
+html.motion .jar__photo { animation: sealed .35s ease 5.35s both; }
+html.motion .jar :is(.jar__full, .jar__level, .jar__pour, .jar__cap, .jar__photo),
+html.motion .jar :is(.jar__pour, .jar__sheen)::before { animation-play-state: paused; }
+html.motion .jar.is-playing :is(.jar__full, .jar__level, .jar__pour, .jar__cap, .jar__photo),
+html.motion .jar.is-playing :is(.jar__pour, .jar__sheen)::before { animation-play-state: running; }
+
+/* the column of ghee rises at a steady pour; it moves faster while hidden behind the label */
+@keyframes jarFill {
+  0% { clip-path: inset(100% 0 0 0); }
+  22% { clip-path: inset(88% 0 0 0); }
+  58% { clip-path: inset(27.4% 0 0 0); }
+  100% { clip-path: inset(10.6% 0 0 0); }
+}
+@keyframes jarLevel {
+  /* the label's lower edge curves up at the sides: show the line only below it */
+  0% { transform: translateY(100%); opacity: 1; }
+  9% { opacity: 1; }
+  11%, 57% { opacity: 0; }
+  22% { transform: translateY(88%); }
+  58% { transform: translateY(27.4%); opacity: 1; }
+  96% { opacity: 1; }
+  100% { transform: translateY(10.6%); opacity: 0; }
+}
+@keyframes pourOn { from { opacity: 1; transform: scaleY(0); } to { opacity: 1; transform: none; } }
+@keyframes pourOff { from { transform-origin: 50% 100%; transform: none; } to { transform-origin: 50% 100%; transform: scaleY(0); } }
+@keyframes flow { to { transform: translateY(30px); } }
+@keyframes lidOn { from { opacity: 0; transform: translateY(-130%); } to { opacity: 1; transform: none; } }
+@keyframes screw { from { transform: translateX(-120%); } to { transform: translateX(380%); } }
+@keyframes sealed { from { opacity: 0; } to { opacity: 1; } }
 
 @media (max-width: 920px) {
   .ghee__grid { grid-template-columns: 1fr; }
@@ -603,3 +682,6 @@ html.motion [data-reveal] { opacity: 0; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
   .marquee__track { animation: none !important; }
 }
+
+/* link from the home shop grid to the full listing (products.html) */
+.shop__all { display: flex; justify-content: center; margin: 40px 0 0; }

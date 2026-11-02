@@ -1,0 +1,118 @@
+/* Rangaa Roots — films page. Each film is a fixed 1920x1080 stage scaled to fit,
+   so every frame looks the same at any window size and can be screen-recorded at 1080p. */
+@font-face { font-family: "Cormorant Garamond"; font-style: normal; font-weight: 300 700; font-display: swap; src: url("../assets/fonts/cormorant-garamond-var-latin.woff2") format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-style: italic; font-weight: 300 700; font-display: swap; src: url("../assets/fonts/cormorant-garamond-italic-var-latin.woff2") format("woff2"); }
+@font-face { font-family: "Manrope"; font-weight: 200 800; font-display: swap; src: url("../assets/fonts/manrope-var-latin.woff2") format("woff2"); }
+@font-face { font-family: "Oswald"; font-weight: 500 700; font-display: swap; src: url("../assets/fonts/oswald-var-latin.woff2") format("woff2"); }
+
+:root {
+  --forest: #143823; --forest-deep: #0f2c1b; --gold: #c59b27; --cream: #fcfaf7; --lotus: #d84473; --kraft: #e9dfcd;
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+  --display: "Cormorant Garamond", Georgia, serif; --body: "Manrope", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--forest-deep); color: rgba(255, 255, 255, .78); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+
+.top { display: flex; justify-content: space-between; align-items: center; padding: 18px clamp(16px, 4vw, 48px); }
+.top__brand { display: flex; align-items: center; gap: 12px; text-decoration: none; font-family: var(--display); font-size: 22px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--cream); }
+.top__brand img { border-radius: 50%; }
+.top__brand small { font-family: var(--body); font-size: 11px; letter-spacing: .24em; color: var(--gold); margin-left: 6px; }
+.top__link { font-size: 14px; font-weight: 600; text-decoration: none; padding: 10px 16px; border-radius: 999px; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2); transition: background-color 200ms ease; }
+@media (hover: hover) and (pointer: fine) { .top__link:hover { background: rgba(255, 255, 255, .08); } }
+
+.wrap { width: min(1280px, 100% - 32px); margin: 8px auto 64px; }
+.screen { position: relative; aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; background: #000; box-shadow: 0 30px 80px rgba(0, 0, 0, .45); }
+.stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; transform: scale(var(--s, .5)); overflow: hidden; background: #120c07; }
+.play {
+  position: absolute; inset: 0; margin: auto; width: 96px; height: 96px; border: 0; border-radius: 50%;
+  display: grid; place-items: center; background: rgba(252, 250, 247, .92); color: var(--forest); cursor: pointer;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .35); transition: transform 160ms var(--ease-out), opacity 200ms ease;
+}
+.play svg { width: 38px; height: 38px; margin-left: 5px; fill: currentColor; }
+.play:active { transform: scale(.95); }
+.play[hidden] { display: grid; opacity: 0; pointer-events: none; transform: scale(.9); }
+
+.bar { height: 3px; margin-top: 14px; border-radius: 3px; background: rgba(255, 255, 255, .12); overflow: hidden; }
+.bar__fill { display: block; height: 100%; background: var(--gold); transform-origin: 0 50%; transform: scaleX(0); }
+
+.reel { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 22px; }
+.reel button {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 16px 18px; border: 0; border-radius: 14px; text-align: left; cursor: pointer;
+  font: inherit; color: rgba(255, 255, 255, .78); background: rgba(255, 255, 255, .05); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+  transition: background-color 200ms ease, box-shadow 200ms ease, transform 160ms var(--ease-out);
+}
+.reel button:active { transform: scale(.97); }
+.reel b { font-family: var(--display); font-size: 24px; font-weight: 600; color: var(--cream); }
+.reel small { font-size: 12.5px; letter-spacing: .06em; }
+.reel button[aria-selected="true"] { background: rgba(197, 155, 39, .14); box-shadow: inset 0 0 0 1.5px var(--gold); }
+@media (hover: hover) and (pointer: fine) { .reel button:not([aria-selected="true"]):hover { background: rgba(255, 255, 255, .09); } }
+.note { margin: 22px 0 0; font-size: 13.5px; line-height: 1.6; max-width: 80ch; color: rgba(255, 255, 255, .6); }
+
+/* ================= inside the stage (all px are 1080p px) ================= */
+.f-layer { position: absolute; inset: 0; }
+.f-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+.f-shade { position: absolute; inset: 0; pointer-events: none; }
+.f-grain { position: absolute; inset: 0; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+.f-copy { position: absolute; left: 150px; top: 50%; width: 760px; transform: translateY(-50%); color: var(--cream); }
+.f-eyebrow { font: 700 22px/1 var(--body); letter-spacing: .32em; text-transform: uppercase; color: var(--gold); margin: 0 0 30px; }
+.f-line { display: block; overflow: hidden; padding-bottom: .06em; }
+.f-line > span { display: block; font-family: var(--display); font-weight: 500; font-size: 112px; line-height: 1; letter-spacing: -.01em; }
+.f-line em { font-style: italic; color: #f0d58a; }
+.f-sub { margin: 34px 0 0; font: 400 28px/1.5 var(--body); color: rgba(252, 250, 247, .8); max-width: 640px; }
+
+/* centred caption over footage */
+.f-caption { position: absolute; left: 0; right: 0; bottom: 120px; text-align: center; color: var(--cream); }
+.f-caption .f-line > span { font-size: 96px; }
+
+/* product lineup */
+.f-row { position: absolute; left: 0; right: 0; bottom: 70px; display: flex; justify-content: center; align-items: flex-end; gap: 10px; }
+.f-row .pack { width: 330px; height: auto; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, .35)); }
+
+/* end card */
+.f-end { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 30px; background: radial-gradient(70% 70% at 50% 45%, #1f4a30, #0b2216); opacity: 0; }
+.f-end img { width: 300px; height: 300px; border-radius: 50%; box-shadow: 0 20px 60px rgba(0, 0, 0, .4); }
+.f-end p { margin: 0; text-align: center; font-family: var(--display); font-style: italic; font-size: 64px; color: var(--cream); }
+.f-end small { display: block; margin-top: 18px; font: 700 22px/1 var(--body); font-style: normal; letter-spacing: .32em; text-transform: uppercase; color: var(--gold); }
+
+/* ---- ghee film: the jar photo, cut into layers (assets/img/jar, 582x644 canvas) ---- */
+.g-bg { background: radial-gradient(60% 75% at 72% 50%, #4a3220 0%, #1e140c 70%, #120c07 100%); }
+.g-card { position: absolute; right: 170px; top: 90px; width: 813px; height: 900px; border-radius: 34px; overflow: hidden; box-shadow: 0 40px 100px rgba(0, 0, 0, .55); }
+.g-card img, .g-card .g-ph { position: absolute; inset: 0; width: 100%; height: 100%; }
+.g-full { clip-path: inset(100% 0 0 0); }
+.g-photo { opacity: 0; }
+.g-level { position: absolute; left: 16%; right: 9%; top: 0; height: 3px; background: rgba(252, 250, 247, .6); box-shadow: 0 0 10px rgba(197, 155, 39, .9); opacity: 0; }
+.g-pour {
+  position: absolute; left: 53.5%; top: 0; width: 1.6%; height: 27.4%; margin-left: -.8%; border-radius: 0 0 40% 40%; overflow: hidden;
+  background: linear-gradient(90deg, rgba(122, 90, 16, .9), var(--gold) 30%, rgba(252, 250, 247, .75) 48%, var(--gold) 66%, rgba(122, 90, 16, .9));
+  -webkit-mask-image: linear-gradient(180deg, #000 0 38%, rgba(0, 0, 0, .5) 40%); mask-image: linear-gradient(180deg, #000 0 38%, rgba(0, 0, 0, .5) 40%);
+  transform-origin: 50% 0; transform: scaleY(0);
+}
+.g-flow { position: absolute; inset: -100% 0 0; background: repeating-linear-gradient(180deg, transparent 0 14px, rgba(252, 250, 247, .3) 14px 18px, transparent 18px 30px); }
+.g-cap { position: absolute; left: 14.09%; top: 0; width: 78.87%; height: 14.29%; }
+.g-cap img { width: 100%; height: 100%; }
+.g-sheen { position: absolute; inset: 0; overflow: hidden; -webkit-mask: url("../assets/img/jar/jar-lid.webp") center / 100% 100% no-repeat; mask: url("../assets/img/jar/jar-lid.webp") center / 100% 100% no-repeat; }
+.g-sheen i { position: absolute; top: 0; bottom: 0; left: 0; width: 28%; background: linear-gradient(90deg, transparent, rgba(252, 250, 247, .55), transparent); transform: translateX(-120%); }
+.g-drip { position: absolute; left: 53.5%; width: 10px; height: 14px; margin-left: -5px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: var(--gold); opacity: 0; }
+
+/* ---------- downloads ---------- */
+.now { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 18px; }
+.now__title { margin: 0; font-family: var(--display); font-size: 28px; font-weight: 600; color: var(--cream); }
+.dl-btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 10px 18px; border-radius: 999px;
+  font-size: 14px; font-weight: 700; text-decoration: none; background: var(--gold); color: var(--forest-deep);
+  transition: transform 160ms var(--ease-out), background-color 200ms ease;
+}
+.dl-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.dl-btn:active { transform: scale(.97); }
+.dl-btn--ghost { background: rgba(255, 255, 255, .06); color: var(--cream); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16); }
+@media (hover: hover) and (pointer: fine) { .dl-btn:hover { background: #d6ae3f; } .dl-btn--ghost:hover { background: rgba(255, 255, 255, .12); } }
+.downloads { margin-top: 48px; padding-top: 32px; border-top: 1px solid rgba(255, 255, 255, .1); scroll-margin-top: 24px; }
+.downloads h2 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 40px; color: var(--cream); }
+.downloads > p { margin: 8px 0 22px; font-size: 14.5px; }
+.dl-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.dl-list li { display: flex; align-items: center; gap: 16px; padding: 14px 16px 14px 20px; border-radius: 14px; background: rgba(255, 255, 255, .05); }
+.dl-list b { font-family: var(--display); font-size: 24px; font-weight: 600; color: var(--cream); }
+.dl-list span { margin-right: auto; font-size: 13px; font-variant-numeric: tabular-nums; color: rgba(255, 255, 255, .6); }
