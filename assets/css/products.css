@@ -1,0 +1,101 @@
+/* =========================================================
+   Rangaa Roots — All Products listing (products.html)
+   Builds on styles.css (tokens, nav, buttons, footer). Packs and labels are
+   SVG from js/labels.js; Oswald is the label's condensed face.
+   Motion: transform + opacity only; hover only on fine pointers.
+   ========================================================= */
+@font-face { font-family: "Oswald"; font-style: normal; font-weight: 500 700; font-display: swap; src: url("../fonts/oswald-var-latin.woff2") format("woff2"); }
+
+:root { --ease-out: cubic-bezier(.23, 1, .32, 1); }
+
+.page-products main { padding-top: var(--nav-h); }
+
+/* ---------- Hero ---------- */
+.pl-hero { padding-block: clamp(48px, 8vw, 104px) clamp(28px, 4vw, 48px); }
+.pl-hero__title {
+  margin-top: 18px; font-family: var(--font-display); font-weight: 500; line-height: .98;
+  font-size: clamp(44px, 7.4vw, 104px); letter-spacing: -.015em; color: var(--forest);
+}
+.pl-hero__title em { font-style: italic; color: var(--gold-text); }
+.pl-hero__lead { max-width: 52ch; margin: 22px 0 0; color: var(--ink-soft); font-size: clamp(16px, 1.3vw, 18px); }
+
+/* ---------- Family tabs: sticky under the nav ---------- */
+.pl-families { position: sticky; top: var(--nav-h); z-index: 50; background: color-mix(in srgb, var(--desk) 92%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 1px 0 var(--line); }
+.pl-families__track { display: flex; gap: 6px; overflow-x: auto; padding-block: 12px; scrollbar-width: none; }
+.pl-families__track::-webkit-scrollbar { display: none; }
+.pl-tab {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 16px;
+  border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--ink-soft); white-space: nowrap;
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: color 200ms ease, background-color 200ms ease, box-shadow 200ms ease, transform 160ms var(--ease-out);
+}
+.pl-tab span { font-variant-numeric: tabular-nums; font-size: 12px; color: var(--gold-text); }
+.pl-tab:active { transform: scale(.97); }
+.pl-tab[aria-current="true"] { background: var(--forest); color: var(--white); box-shadow: none; }
+.pl-tab[aria-current="true"] span { color: var(--gold); }
+@media (hover: hover) and (pointer: fine) { .pl-tab:not([aria-current="true"]):hover { color: var(--forest); box-shadow: inset 0 0 0 1px rgba(20, 56, 35, .35); } }
+
+/* ---------- Family sections ---------- */
+.pl-family { padding-block: clamp(56px, 7vw, 88px) 8px; scroll-margin-top: calc(var(--nav-h) + 64px); }
+.pl-family__head { display: grid; grid-template-columns: auto 1fr; gap: 6px 22px; align-items: end; padding-bottom: 22px; margin-bottom: 28px; border-bottom: 1px solid var(--line); }
+.pl-family__num { grid-row: span 2; font-family: var(--font-display); font-size: clamp(48px, 6vw, 76px); line-height: .8; color: var(--gold); font-variant-numeric: lining-nums tabular-nums; }
+.pl-family__name { font-family: var(--font-display); font-weight: 600; font-size: clamp(28px, 3.4vw, 42px); line-height: 1.05; color: var(--forest); }
+.pl-family__blurb { margin: 0; color: var(--ink-soft); max-width: 60ch; }
+
+.pl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 232px), 1fr)); gap: clamp(14px, 2vw, 24px); }
+
+/* ---------- Product card ---------- */
+.pl-card { position: relative; display: flex; flex-direction: column; border-radius: 22px; background: var(--paper); box-shadow: 0 1px 0 var(--line), 0 0 0 1px var(--line); overflow: hidden; }
+.pl-card__shelf {
+  position: relative; display: grid; place-items: center; padding: 22px 18px 6px; aspect-ratio: 1 / 1.02;
+  background: radial-gradient(120% 80% at 50% 18%, #fffdf8 0%, var(--tint-kraft) 62%, var(--kraft) 100%);
+}
+.pl-card__shelf .pack { width: 100%; height: 100%; max-width: 250px; transition: transform 450ms var(--ease-out); }
+.pl-card__body { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px 18px; flex: 1; }
+.pl-card__name { font-family: var(--font-display); font-weight: 600; font-size: 23px; line-height: 1.1; color: var(--forest); }
+.pl-card__note { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink-soft); }
+.pl-card__foot { margin-top: auto; padding-top: 10px; display: flex; align-items: center; gap: 8px; }
+.pl-size { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-text); font-variant-numeric: tabular-nums; margin-right: auto; }
+.pl-mini {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 12px; border: 0; border-radius: 999px;
+  font-size: 13px; font-weight: 600; background: transparent; color: var(--forest); box-shadow: inset 0 0 0 1px rgba(20, 56, 35, .22);
+  transition: transform 160ms var(--ease-out), background-color 200ms ease, color 200ms ease;
+}
+.pl-mini .ic { width: 16px; height: 16px; }
+.pl-mini--solid { background: var(--forest); color: var(--white); box-shadow: none; }
+.pl-mini:active { transform: scale(.97); }
+@media (hover: hover) and (pointer: fine) {
+  .pl-card:hover .pack { transform: translateY(-6px); }
+  .pl-mini:hover { background: var(--tint-leaf); }
+  .pl-mini--solid:hover { background: var(--forest-2); }
+}
+
+/* entrance: a short stagger per row, once */
+html.motion .pl-card { opacity: 0; transform: translateY(14px); }
+html.motion .pl-card.is-in { opacity: 1; transform: none; transition: opacity 500ms var(--ease-out) var(--d, 0ms), transform 600ms var(--ease-out) var(--d, 0ms); }
+
+/* ---------- Label viewer ---------- */
+.pl-label {
+  width: min(760px, 100% - 32px); max-height: calc(100dvh - 32px); padding: 0; border: 0; border-radius: 24px;
+  background: var(--paper); color: var(--ink); box-shadow: 0 30px 80px rgba(11, 34, 22, .35); overflow: auto;
+}
+.pl-label::backdrop { background: rgba(11, 34, 22, .55); }
+.pl-label[open] { animation: labelIn 260ms var(--ease-out); }
+.pl-label[open]::backdrop { animation: fadeIn 260ms ease; }
+.pl-label.is-closing { animation: labelOut 150ms ease-in forwards; }
+.pl-label.is-closing::backdrop { animation: fadeIn 150ms ease reverse forwards; }
+@keyframes labelIn { from { opacity: 0; transform: scale(.96); } }
+@keyframes labelOut { to { opacity: 0; transform: scale(.98); } }
+@keyframes fadeIn { from { opacity: 0; } }
+.pl-label__head { display: flex; justify-content: space-between; align-items: start; gap: 16px; padding: 22px 22px 0 28px; }
+.pl-label__title { font-family: var(--font-display); font-weight: 600; font-size: clamp(26px, 3vw, 34px); color: var(--forest); margin-top: 6px; }
+.pl-label__art { margin: 18px 22px; padding: clamp(16px, 3vw, 32px); border-radius: 16px; background: var(--kraft); display: grid; place-items: center; }
+.pl-label__art svg { width: 100%; height: auto; max-height: 62dvh; filter: drop-shadow(0 10px 22px rgba(59, 36, 24, .22)); }
+.pl-label__foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 0 28px 24px; }
+.pl-label__meta { margin: 0; font-size: 14px; color: var(--ink-soft); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-label[open], .pl-label.is-closing { animation-name: fadeIn; }
+  .pl-label.is-closing { animation-direction: reverse; }
+  .pl-card__shelf .pack { transition: none; }
+}

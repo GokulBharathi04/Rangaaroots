@@ -5,6 +5,7 @@
  *   data-curtain           image frame wipes up while its picture counter-moves and settles from 1.15x
  *   data-parallax="12"     drifts through the viewport by that many percent of its own height
  *   data-glow              slow golden light swells once when scrolled into view
+ *   data-play              gets .is-playing on arrival, starting a CSS sequence held paused until then
  *   data-count="40"        counts up (data-count="25,30" + data-join="–" for a range; data-prefix / data-suffix)
  *   data-magnetic          button drifts a few px toward the pointer
  *
@@ -88,6 +89,11 @@ window.Motion = (() => {
     $$("[data-glow]").forEach((el) => {
       onArrive(el, () => el.classList.add("is-glowing"));
     });
+  });
+
+  /* ---------- Play a CSS sequence once, on arrival (the ghee jar) ---------- */
+  const plays = safe(() => {
+    $$("[data-play]").forEach((el) => onArrive(el, () => el.classList.add("is-playing")));
   });
 
   /* ---------- Line reveal: each rendered line rises from behind its own mask ----------
@@ -314,6 +320,7 @@ window.Motion = (() => {
       () => curtains(),
       () => parallax(),
       () => glows(),
+      () => plays(),
       () => $$("[data-magnetic]").forEach((el) => magnetic(el)),
       // line breaks depend on the loaded fonts, so split only once they are in.
       // ScrollTrigger refreshes itself on load; refresh once more if fonts land after that.

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Films | Rangaa Roots</title>
+  <meta name="description" content="Short brand films for Rangaa Roots: A2 Bilona ghee, the coconut range, thokku and native grains.">
+  <meta name="theme-color" content="#0f2c1b">
+  <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg">
+  <link rel="stylesheet" href="films.css?v=2">
+</head>
+<body>
+  <header class="top">
+    <a class="top__brand" href="../index.html"><img src="../assets/img/logo-round-240.webp" alt="" width="40" height="40"><span>Rangaa Roots <small>Films</small></span></a>
+    <a class="top__link" href="../products.html">All products</a>
+  </header>
+
+  <main class="wrap">
+    <div class="screen" id="screen">
+      <div class="stage" id="stage" aria-live="polite"></div>
+      <button class="play" id="play" aria-label="Play film">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+      </button>
+    </div>
+    <div class="bar"><span class="bar__fill" id="progress"></span></div>
+    <div class="now">
+      <p class="now__title" id="nowTitle"></p>
+      <a class="dl-btn" id="nowDownload" download>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> Download MP4
+      </a>
+    </div>
+
+    <div class="reel" id="reel" role="tablist" aria-label="Films"></div>
+
+    <section class="downloads" id="downloads" aria-labelledby="dlHead">
+      <h2 id="dlHead">Download the films</h2>
+      <p>1920 × 1080 · 30 fps · H.264 MP4, ready for Instagram, YouTube, WhatsApp and the website.</p>
+      <ul class="dl-list" id="dlList"></ul>
+    </section>
+
+    <p class="note">Built with code from the Rangaa Roots jar photo, the generated product labels and free <a href="https://mixkit.co" target="_blank" rel="noopener">Mixkit</a> stock footage.</p>
+  </main>
+
+  <script src="../assets/vendor/gsap/gsap.min.js"></script>
+  <script src="../assets/js/catalog.js?v=1"></script>
+  <script src="../assets/js/labels.js?v=1"></script>
+  <script src="films.js?v=2"></script>
+</body>
+</html>

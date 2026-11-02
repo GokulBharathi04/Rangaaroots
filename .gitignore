@@ -1,2 +1,10 @@
 .taste-skill/
 .playwright-mcp/
+
+# Raw source files: kept locally, not part of the site
+/Videos/
+/*.zip
+/*.eps
+/Ghee.jpeg
+/Coconut Sugar.jpeg
+/Ranga Roots Logo Png.png

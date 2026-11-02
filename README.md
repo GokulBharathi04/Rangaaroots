@@ -65,6 +65,7 @@ The temple background (`gopuram.jpg`, with the same framing, tint and fade) and 
 | `data-curtain` | image frame wipes up while the picture counter-moves and settles |
 | `data-parallax="8"` | drifts through the viewport by that % of its height (temple, ghee photos, founder) |
 | `data-glow` | slow golden light swells on arrival, then breathes |
+| `data-play` | starts a CSS sequence on arrival: the Ghee section's jar, cut from the product photo (`assets/img/jar/`), is filled from a pouring stream, then its lid drops on and is screwed down |
 | `data-lines` | each rendered line rises from its own mask (founder quote, CTA) |
 | `data-count` | counts up; `data-count="25,30" data-join="–"` for a range |
 | `data-magnetic` | button drifts toward the pointer (mouse only) |

@@ -18,7 +18,7 @@
   <link rel="preload" href="assets/fonts/cormorant-garamond-italic-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/manrope-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/vendor/lenis/lenis.css">
-  <link rel="stylesheet" href="assets/css/styles.css?v=18">
+  <link rel="stylesheet" href="assets/css/styles.css?v=25">
 </head>
 <body>
 
@@ -118,11 +118,24 @@
   <div class="container ghee__grid">
     <div class="ghee__media">
       <div class="ghee__frame" data-glow data-parallax="6">
-        <div class="ghee__img" data-curtain><picture><source srcset="assets/img/ghee-dabba-800.webp 800w, assets/img/ghee-dabba.webp 1600w" sizes="(max-width: 920px) 92vw, 46vw" type="image/webp"><img src="assets/img/ghee-dabba.jpg" alt="A2 Bilona ghee, golden and granular, in a steel dabba" loading="lazy" width="1920" height="1280"></picture></div>
+        <div class="ghee__img jar" data-play>
+          <!-- the product photo, cut into layers (assets/img/jar): an empty open jar fills with ghee
+               from a pouring stream, the real lid drops on and is screwed down, then the untouched
+               photo takes over. CSS: "Ghee jar" -->
+          <img class="jar__layer jar__empty" src="assets/img/jar/jar-empty.webp" alt="" width="582" height="644">
+          <img class="jar__layer jar__full" src="assets/img/jar/jar-full.webp" alt="" width="582" height="644">
+          <span class="jar__level" aria-hidden="true"></span>
+          <span class="jar__pour" aria-hidden="true"></span>
+          <span class="jar__cap" aria-hidden="true">
+            <img src="assets/img/jar/jar-lid.webp" alt="" width="459" height="92">
+            <span class="jar__sheen"></span>
+          </span>
+          <picture class="jar__layer jar__photo">
+            <source srcset="assets/img/jar/jar-sealed.webp" type="image/webp">
+            <img src="assets/img/jar/jar-sealed.jpg" alt="Rangaa Roots A2 Cow Ghee in a 500 ml glass jar with a black lid, made by the traditional Bilona method" width="582" height="644">
+          </picture>
+        </div>
       </div>
-      <figure class="ghee__inset" data-glow data-parallax="-22">
-        <div class="ghee__img" data-curtain><picture><source srcset="assets/img/ghee-jar.webp" type="image/webp"><img src="assets/img/ghee-jar.jpg" alt="Clear glass jar of liquid golden ghee" loading="lazy" width="1280" height="960"></picture></div>
-      </figure>
       <div class="ghee__seal" aria-hidden="true">
         <svg viewBox="0 0 120 120"><defs><path id="seal" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0"/></defs><text><textPath href="#seal" textLength="286" lengthAdjust="spacingAndGlyphs">HAND CHURNED · BEFORE SUNRISE · A2 BILONA ·</textPath></text></svg>
         <svg class="ic"><use href="#i-drop"/></svg>
@@ -188,6 +201,7 @@
     </div>
     <div class="grid" id="grid" aria-live="polite"></div>
     <p class="empty" id="empty" hidden>No products match your search. Try “malt” or “soup”.</p>
+    <p class="shop__all"><a class="btn btn--paper" href="products.html">See all 35 products <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a></p>
   </div>
 </section>
 
@@ -312,9 +326,9 @@
 <script src="assets/vendor/gsap/gsap.min.js" defer></script>
 <script src="assets/vendor/gsap/ScrollTrigger.min.js" defer></script>
 <script src="assets/vendor/lenis/lenis.min.js" defer></script>
-<script src="assets/js/scroll.js?v=18" defer></script>
-<script src="assets/js/data.js?v=18" defer></script>
-<script src="assets/js/motion.js?v=18" defer></script>
-<script src="assets/js/main.js?v=18" defer></script>
+<script src="assets/js/scroll.js?v=24" defer></script>
+<script src="assets/js/data.js?v=24" defer></script>
+<script src="assets/js/motion.js?v=24" defer></script>
+<script src="assets/js/main.js?v=24" defer></script>
 </body>
 </html>
