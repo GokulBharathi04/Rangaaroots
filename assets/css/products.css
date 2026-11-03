@@ -1,11 +1,8 @@
 /* =========================================================
    Rangaa Roots — All Products listing (products.html)
-   Builds on styles.css (tokens, nav, buttons, footer). Packs and labels are
-   SVG from js/labels.js; Oswald is the label's condensed face.
+   Builds on styles.css (tokens, nav, buttons, footer).
    Motion: transform + opacity only; hover only on fine pointers.
    ========================================================= */
-@font-face { font-family: "Oswald"; font-style: normal; font-weight: 500 700; font-display: swap; src: url("../fonts/oswald-var-latin.woff2") format("woff2"); }
-
 :root { --ease-out: cubic-bezier(.23, 1, .32, 1); }
 
 .page-products main { padding-top: var(--nav-h); }
@@ -46,11 +43,9 @@
 
 /* ---------- Product card ---------- */
 .pl-card { position: relative; display: flex; flex-direction: column; border-radius: 22px; background: var(--paper); box-shadow: 0 1px 0 var(--line), 0 0 0 1px var(--line); overflow: hidden; }
-.pl-card__shelf {
-  position: relative; display: grid; place-items: center; padding: 22px 18px 6px; aspect-ratio: 1 / 1.02;
-  background: radial-gradient(120% 80% at 50% 18%, #fffdf8 0%, var(--tint-kraft) 62%, var(--kraft) 100%);
-}
-.pl-card__shelf .pack { width: 100%; height: 100%; max-width: 250px; transition: transform 450ms var(--ease-out); }
+.pl-card__shelf { aspect-ratio: 4 / 5; overflow: hidden; background: var(--kraft); }
+.pl-card__shelf picture, .pl-card__shelf img { display: block; width: 100%; height: 100%; }
+.pl-card__shelf img { object-fit: cover; transition: transform 450ms var(--ease-out); }
 .pl-card__body { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px 18px; flex: 1; }
 .pl-card__name { font-family: var(--font-display); font-weight: 600; font-size: 23px; line-height: 1.1; color: var(--forest); }
 .pl-card__note { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink-soft); }
@@ -61,11 +56,10 @@
   font-size: 13px; font-weight: 600; background: transparent; color: var(--forest); box-shadow: inset 0 0 0 1px rgba(20, 56, 35, .22);
   transition: transform 160ms var(--ease-out), background-color 200ms ease, color 200ms ease;
 }
-.pl-mini .ic { width: 16px; height: 16px; }
 .pl-mini--solid { background: var(--forest); color: var(--white); box-shadow: none; }
 .pl-mini:active { transform: scale(.97); }
 @media (hover: hover) and (pointer: fine) {
-  .pl-card:hover .pack { transform: translateY(-6px); }
+  .pl-card:hover .pl-card__shelf img { transform: scale(1.03); }
   .pl-mini:hover { background: var(--tint-leaf); }
   .pl-mini--solid:hover { background: var(--forest-2); }
 }
@@ -74,28 +68,6 @@
 html.motion .pl-card { opacity: 0; transform: translateY(14px); }
 html.motion .pl-card.is-in { opacity: 1; transform: none; transition: opacity 500ms var(--ease-out) var(--d, 0ms), transform 600ms var(--ease-out) var(--d, 0ms); }
 
-/* ---------- Label viewer ---------- */
-.pl-label {
-  width: min(760px, 100% - 32px); max-height: calc(100dvh - 32px); padding: 0; border: 0; border-radius: 24px;
-  background: var(--paper); color: var(--ink); box-shadow: 0 30px 80px rgba(11, 34, 22, .35); overflow: auto;
-}
-.pl-label::backdrop { background: rgba(11, 34, 22, .55); }
-.pl-label[open] { animation: labelIn 260ms var(--ease-out); }
-.pl-label[open]::backdrop { animation: fadeIn 260ms ease; }
-.pl-label.is-closing { animation: labelOut 150ms ease-in forwards; }
-.pl-label.is-closing::backdrop { animation: fadeIn 150ms ease reverse forwards; }
-@keyframes labelIn { from { opacity: 0; transform: scale(.96); } }
-@keyframes labelOut { to { opacity: 0; transform: scale(.98); } }
-@keyframes fadeIn { from { opacity: 0; } }
-.pl-label__head { display: flex; justify-content: space-between; align-items: start; gap: 16px; padding: 22px 22px 0 28px; }
-.pl-label__title { font-family: var(--font-display); font-weight: 600; font-size: clamp(26px, 3vw, 34px); color: var(--forest); margin-top: 6px; }
-.pl-label__art { margin: 18px 22px; padding: clamp(16px, 3vw, 32px); border-radius: 16px; background: var(--kraft); display: grid; place-items: center; }
-.pl-label__art svg { width: 100%; height: auto; max-height: 62dvh; filter: drop-shadow(0 10px 22px rgba(59, 36, 24, .22)); }
-.pl-label__foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 0 28px 24px; }
-.pl-label__meta { margin: 0; font-size: 14px; color: var(--ink-soft); }
-
 @media (prefers-reduced-motion: reduce) {
-  .pl-label[open], .pl-label.is-closing { animation-name: fadeIn; }
-  .pl-label.is-closing { animation-direction: reverse; }
-  .pl-card__shelf .pack { transition: none; }
+  .pl-card__shelf img { transition: none; }
 }

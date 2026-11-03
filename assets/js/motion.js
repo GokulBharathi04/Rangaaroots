@@ -5,7 +5,7 @@
  *   data-curtain           image frame wipes up while its picture counter-moves and settles from 1.15x
  *   data-parallax="12"     drifts through the viewport by that many percent of its own height
  *   data-glow              slow golden light swells once when scrolled into view
- *   data-play              gets .is-playing on arrival, starting a CSS sequence held paused until then
+ *   data-film              wraps a <video> and its .film__toggle; plays only while on screen
  *   data-count="40"        counts up (data-count="25,30" + data-join="–" for a range; data-prefix / data-suffix)
  *   data-magnetic          button drifts a few px toward the pointer
  *
@@ -91,10 +91,31 @@ window.Motion = (() => {
     });
   });
 
-  /* ---------- Play a CSS sequence once, on arrival (the ghee jar) ---------- */
-  const plays = safe(() => {
-    $$("[data-play]").forEach((el) => onArrive(el, () => el.classList.add("is-playing")));
-  });
+  /* ---------- Films: play while on screen, so only one or two ever decode at once ----------
+   * Not wrapped in safe(): the button must work under reduced motion too, where the film
+   * holds its poster until asked. Pausing by hand sticks, even after scrolling away and back. */
+  function films() {
+    const still = reduce || navigator.connection?.saveData;
+    const io = new IntersectionObserver((entries) => entries.forEach(({ target: v, isIntersecting }) => {
+      if (!isIntersecting) v.pause();
+      else if (!still && !v.dataset.heldPaused) v.play().catch(() => {});
+    }), { threshold: 0.25 });
+    $$("[data-film]").forEach((frame) => {
+      const v = $("video", frame), btn = $(".film__toggle", frame);
+      const sync = () => {
+        btn.dataset.state = v.paused ? "paused" : "playing";
+        btn.setAttribute("aria-label", v.paused ? "Play video" : "Pause video");
+      };
+      v.addEventListener("play", sync);
+      v.addEventListener("pause", sync);
+      btn.addEventListener("click", () => {
+        if (v.paused) { delete v.dataset.heldPaused; v.play().catch(() => {}); }
+        else { v.dataset.heldPaused = "1"; v.pause(); }
+      });
+      sync();
+      io.observe(v);
+    });
+  }
 
   /* ---------- Line reveal: each rendered line rises from behind its own mask ----------
    * Lines are measured after fonts load; once the reveal finishes the original nodes go
@@ -150,10 +171,13 @@ window.Motion = (() => {
    * The stats fade in at about 1.3s; count up only if the script arrived in time to
    * start from zero, otherwise leave the final values alone. */
   const hero = safe(() => {
-    const elapsed = performance.now() / 1000;
-    if (elapsed < 1.2) {
-      $$(".hero__stats [data-count]").forEach((el, i) => countUp(el, 1.3 - elapsed + i * 0.12));
-    }
+    // the entrance is held behind the intro film, so time it from when the film lets go
+    window.Intro.released.then(() => {
+      const elapsed = (performance.now() - window.Intro.releasedAt) / 1000;
+      if (elapsed < 1.2) {
+        $$(".hero__stats [data-count]").forEach((el, i) => countUp(el, 1.3 - elapsed + i * 0.12));
+      }
+    });
     // the temple drifts down at a fraction of scroll speed while the hero leaves; its
     // top edge only uncovers once that part of the hero is already off screen
     gsap.to("#heroMedia", { yPercent: 14, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
@@ -320,7 +344,7 @@ window.Motion = (() => {
       () => curtains(),
       () => parallax(),
       () => glows(),
-      () => plays(),
+      () => films(),
       () => $$("[data-magnetic]").forEach((el) => magnetic(el)),
       // line breaks depend on the loaded fonts, so split only once they are in.
       // ScrollTrigger refreshes itself on load; refresh once more if fonts land after that.

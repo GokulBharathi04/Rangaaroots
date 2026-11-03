@@ -298,7 +298,7 @@ html.motion .hero__stats .stat:nth-child(3) { animation-delay: 1.49s; }
 .ghee__frame.is-glowing::after { opacity: 1; animation: breathe 6s ease-in-out 2.6s infinite alternate; }
 html:not(.motion) .ghee__frame::after { opacity: .8; }
 .ghee__seal {
-  position: absolute; left: -5%; top: 6%; z-index: 2;
+  position: absolute; left: -5%; top: -18%; z-index: 2;   /* above the film's on-screen text */
   width: 124px; height: 124px; border-radius: 50%;
   display: grid; place-items: center;
   background: var(--lotus-deep); color: var(--white);
@@ -315,87 +315,54 @@ html:not(.motion) .ghee__frame::after { opacity: .8; }
 .fact b { font-family: var(--font-display); font-size: clamp(2.5rem, 2rem + 1.6vw, 3.5rem); font-weight: 500; line-height: 1; color: var(--forest); white-space: nowrap; font-variant-numeric: lining-nums; }
 @keyframes breathe { from { opacity: 1; } to { opacity: .55; } }
 
-/* ---------- Ghee jar: the product photo, filled and sealed ----------
-   Layers cut from the photo (assets/img/jar) stack on one 582x644 canvas. Without motion
-   (reduced motion, no script) only the untouched photo shows. Under html.motion each part
-   holds its first keyframe until motion.js adds .is-playing on arrival, then it plays once:
-   stream 0s, fill 0.2-3.6s, stream ends 3.5s, lid 3.9s, screwed down 4.45s, photo 5.35s.
-   Positions are % of the canvas, measured from the photo (lid box, rim at 10.6%, label
-   top at 27.4%, mouth on the lid's centre line at 53.5%). */
-.jar { position: relative; aspect-ratio: 582 / 644; overflow: hidden; background: var(--kraft); }
-.jar__layer, .jar__layer img { position: absolute; inset: 0; width: 100%; height: 100%; }
-.jar__empty, .jar__full, .jar__level, .jar__pour, .jar__cap { display: none; }
-html.motion .jar :is(.jar__empty, .jar__full, .jar__level, .jar__pour, .jar__cap) { display: block; }
+/* ---------- Films: muted, looping brand videos ----------
+   motion.js plays each one only while it is on screen. Under reduced motion or data saver
+   the poster stays still and the button starts it. */
+.film { position: relative; aspect-ratio: 848 / 478; overflow: hidden; background: var(--kraft); }
+.film video { width: 100%; height: 100%; object-fit: cover; }
+.film .film__toggle {
+  position: absolute; left: 12px; bottom: 12px; display: grid; place-items: center; width: 44px; height: 44px;
+  border: 0; border-radius: 50%; background: rgba(11, 34, 22, .55); color: var(--paper);
+  transition: transform 160ms ease-out, background-color 200ms ease;
+}
+.film__toggle .ic { width: 18px; height: 18px; }
+.film__toggle:active { transform: scale(.97); }
+.film__toggle[data-state="playing"] .film__play, .film__toggle[data-state="paused"] .film__pause { display: none; }
+@media (hover: hover) and (pointer: fine) { .film__toggle:hover { background: rgba(11, 34, 22, .8); } }
 
-/* the stream: amber with a lit core; inside the glass (below the rim) it shows through at reduced strength */
-.jar__pour {
-  position: absolute; left: 53.5%; top: 0; width: 1.6%; height: 27.4%; margin-left: -.8%;
-  border-radius: 0 0 40% 40%; overflow: hidden;
-  background: linear-gradient(90deg, rgba(122, 90, 16, .9), var(--gold) 30%, rgba(252, 250, 247, .75) 48%, var(--gold) 66%, rgba(122, 90, 16, .9));
-  -webkit-mask-image: linear-gradient(180deg, #000 0 38%, rgba(0, 0, 0, .5) 40%, rgba(0, 0, 0, .5) 100%);
-  mask-image: linear-gradient(180deg, #000 0 38%, rgba(0, 0, 0, .5) 40%, rgba(0, 0, 0, .5) 100%);
-  transform-origin: 50% 0;
+/* ---------- Intro film: plays once a session, then carries on into the hero ----------
+   The video ends mid push-in on cream, the same family as the hero's surface. intro.js keeps
+   that push going while the layer dissolves, and the hero arrives moving the same way. */
+.intro { display: none; }
+/* the page stays scrollable behind the film (Lenis ignores input, the overlay takes touch), so the
+   scrollbar is already there and nothing shifts when the film lets go. The html state class is
+   intro-on, not intro: .intro { display: none } above would otherwise hide the whole document. */
+html.intro-on.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: visible; }
+.intro { touch-action: none; }
+html.intro-on .intro, .intro.is-leaving { display: block; position: fixed; inset: 0; z-index: 400; overflow: hidden; background: #e8e1cf; }
+.intro__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+/* tall screens: cropping a wide film would cut the logo, so it floats, feathered into the cream */
+@media (max-aspect-ratio: 1/1) {
+  .intro__video {
+    inset: 50% auto auto 50%; width: 190vw; height: auto; aspect-ratio: 848 / 478; translate: -50% -50%;
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+    mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+  }
 }
-/* streaks running down the stream so it reads as flowing */
-.jar__pour::before {
-  content: ""; position: absolute; inset: -100% 0 0;
-  background: repeating-linear-gradient(180deg, transparent 0 14px, rgba(252, 250, 247, .28) 14px 18px, transparent 18px 30px);
+.intro__skip {
+  position: absolute; right: var(--gutter); bottom: 24px; min-height: 44px; padding: 8px 18px; border: 0; border-radius: 999px;
+  background: rgba(20, 56, 35, .1); color: var(--forest); font-size: 14px; font-weight: 600;
+  transition: transform 160ms ease-out, background-color 200ms ease;
+  animation: introSkip 400ms ease-out 800ms both;
 }
-/* the ghee line as it rises: a thin lit edge where the surface meets the glass */
-.jar__level { position: absolute; inset: 0; pointer-events: none; }
-.jar__level::before {
-  content: ""; position: absolute; left: 16%; right: 9%; top: 0; height: 2px;
-  background: rgba(252, 250, 247, .55); box-shadow: 0 0 6px rgba(197, 155, 39, .8);
-}
-.jar__cap { position: absolute; left: 14.09%; top: 0; width: 78.87%; height: 14.29%; }
-.jar__cap img { position: absolute; inset: 0; width: 100%; height: 100%; }
-/* the sheen is cut to the lid's own shape, so it can only ever light the lid */
-.jar__sheen {
-  position: absolute; inset: 0; overflow: hidden;
-  -webkit-mask: url("../img/jar/jar-lid.webp") center / 100% 100% no-repeat;
-  mask: url("../img/jar/jar-lid.webp") center / 100% 100% no-repeat;
-}
-.jar__sheen::before {
-  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 28%;
-  background: linear-gradient(90deg, transparent, rgba(252, 250, 247, .5), transparent);
-  transform: translateX(-120%);
-}
-
-html.motion .jar__full { animation: jarFill 3.4s linear .2s both; }
-html.motion .jar__level { animation: jarLevel 3.4s linear .2s both; }
-html.motion .jar__pour { animation: pourOn .35s var(--ease-lux) both, pourOff .3s var(--ease-lux) 3.5s forwards; }
-html.motion .jar__pour::before { animation: flow .45s linear 8; }   /* only while the stream runs */
-html.motion .jar__cap { animation: lidOn .55s var(--ease-lux) 3.9s both; }
-html.motion .jar__sheen::before { animation: screw .45s var(--ease-in-out) 4.45s 2 both; }
-html.motion .jar__photo { animation: sealed .35s ease 5.35s both; }
-html.motion .jar :is(.jar__full, .jar__level, .jar__pour, .jar__cap, .jar__photo),
-html.motion .jar :is(.jar__pour, .jar__sheen)::before { animation-play-state: paused; }
-html.motion .jar.is-playing :is(.jar__full, .jar__level, .jar__pour, .jar__cap, .jar__photo),
-html.motion .jar.is-playing :is(.jar__pour, .jar__sheen)::before { animation-play-state: running; }
-
-/* the column of ghee rises at a steady pour; it moves faster while hidden behind the label */
-@keyframes jarFill {
-  0% { clip-path: inset(100% 0 0 0); }
-  22% { clip-path: inset(88% 0 0 0); }
-  58% { clip-path: inset(27.4% 0 0 0); }
-  100% { clip-path: inset(10.6% 0 0 0); }
-}
-@keyframes jarLevel {
-  /* the label's lower edge curves up at the sides: show the line only below it */
-  0% { transform: translateY(100%); opacity: 1; }
-  9% { opacity: 1; }
-  11%, 57% { opacity: 0; }
-  22% { transform: translateY(88%); }
-  58% { transform: translateY(27.4%); opacity: 1; }
-  96% { opacity: 1; }
-  100% { transform: translateY(10.6%); opacity: 0; }
-}
-@keyframes pourOn { from { opacity: 1; transform: scaleY(0); } to { opacity: 1; transform: none; } }
-@keyframes pourOff { from { transform-origin: 50% 100%; transform: none; } to { transform-origin: 50% 100%; transform: scaleY(0); } }
-@keyframes flow { to { transform: translateY(30px); } }
-@keyframes lidOn { from { opacity: 0; transform: translateY(-130%); } to { opacity: 1; transform: none; } }
-@keyframes screw { from { transform: translateX(-120%); } to { transform: translateX(380%); } }
-@keyframes sealed { from { opacity: 0; } to { opacity: 1; } }
+.intro__skip:active { transform: scale(.97); }
+@media (hover: hover) and (pointer: fine) { .intro__skip:hover { background: rgba(20, 56, 35, .18); } }
+.intro.is-leaving .intro__skip { display: none; }
+@keyframes introSkip { from { opacity: 0; } }
+/* the hero waits behind the film, then comes forward with the camera */
+html.intro-on :is(.hero__bg, .hero .eyebrow, .hero__title .line__i, .hero__lead, .hero__cta .btn, .hero__stats .stat) { animation-play-state: paused; }
+html.motion.intro-through .hero__bg { animation-name: heroBgThrough; }
+@keyframes heroBgThrough { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
 
 @media (max-width: 920px) {
   .ghee__grid { grid-template-columns: 1fr; }
@@ -450,7 +417,7 @@ html.motion [data-curtain] { opacity: 0; }
 
 /* ---------- Products — the pantry ---------- */
 .shop { background: var(--paper); }
-.search { position: relative; display: flex; align-items: center; width: min(100%, 380px); }
+.search { position: relative; display: flex; align-items: center; flex: 1 1 280px; max-width: 380px; }
 .search .ic { position: absolute; left: 20px; color: var(--ink-soft); pointer-events: none; }
 .search input {
   width: 100%; min-height: 52px; padding: 12px 22px 12px 52px;
@@ -482,6 +449,16 @@ html.motion [data-curtain] { opacity: 0; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: clamp(36px, 4vw, 56px) clamp(20px, 2.4vw, 32px); }
 .card { position: relative; display: flex; flex-direction: column; }
 .card[hidden] { display: none; }
+/* one heading per product family, spanning the whole row */
+.shelf { grid-column: 1 / -1; scroll-margin-top: calc(var(--nav-h) + 24px); padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: calc(-1 * clamp(12px, 2vw, 24px)); }
+.shelf:not(:first-child) { margin-top: clamp(16px, 2.5vw, 32px); }
+.shelf[hidden] { display: none; }
+.shelf__name { font-family: var(--font-display); font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem); font-weight: 500; line-height: 1.1; color: var(--forest); }
+.shelf__name span { font-family: var(--font-body, inherit); font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--gold-text); vertical-align: middle; margin-left: 6px; }
+.shelf__blurb { margin: 6px 0 0; color: var(--ink-soft); font-size: var(--fs-small); max-width: 60ch; }
+/* a shelf with a film: heading on one side, the film explaining the range on the other */
+.shelf--film { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: clamp(24px, 4vw, 64px); align-items: end; }
+@media (max-width: 760px) { .shelf--film { grid-template-columns: minmax(0, 1fr); } }
 .card__img { aspect-ratio: 4 / 5; overflow: hidden; background: var(--desk); }
 .card__img picture, .card__img img { width: 100%; height: 100%; }
 .card__img img { object-fit: cover; transition: transform 1100ms var(--ease-lux); }
@@ -524,65 +501,17 @@ html.motion [data-curtain] { opacity: 0; }
   .why__grid { grid-template-columns: 1fr 1fr; }
   .why__card--lg { grid-row: auto; grid-column: span 2; min-height: 300px; }
 }
-@media (max-width: 600px) {
+/* every category stays visible: the tabs wrap instead of scrolling out of sight */
+@media (max-width: 1000px) {
   .chips { flex-wrap: wrap; overflow: visible; border-radius: 26px; }
+}
+@media (max-width: 600px) {
   .grid { grid-template-columns: 1fr 1fr; gap: 32px 14px; }
   .card h3 { font-size: 1.2rem; }
   .card__note { font-size: 13px; }
   .why__grid { grid-template-columns: 1fr; }
   .why__card--lg { grid-column: auto; min-height: 280px; }
 }
-
-/* ---------- Trace — a batch certificate ---------- */
-.trace__grid { display: grid; grid-template-columns: 1fr 1.05fr; gap: clamp(48px, 7vw, 112px); align-items: center; }
-.trace__lead { margin: 22px 0 0; font-size: var(--fs-lead); line-height: 1.7; color: var(--ink); max-width: 46ch; }
-.trace__form { display: flex; gap: 10px; margin: 36px 0 18px; }
-.trace__form input {
-  flex: 1; min-width: 0; min-height: 56px; padding: 12px 24px; border: 0; border-radius: 999px; background: var(--paper);
-  box-shadow: inset 0 0 0 1px var(--line);
-  font: inherit; font-size: 15px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink);
-  font-variant-numeric: tabular-nums;
-  transition: box-shadow 400ms var(--ease-lux);
-}
-.trace__form input::placeholder { color: var(--ink-soft); font-weight: 500; }
-.trace__form input:focus { outline: none; box-shadow: inset 0 0 0 1.5px var(--forest), 0 0 0 4px rgba(20, 56, 35, .12); }
-.trace__form .btn { min-height: 56px; padding-inline: 32px; }
-.trace__try { font-size: 13.5px; color: var(--ink-soft); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0; }
-.trace__try span { display: contents; }
-.trace__try button {
-  border: 0; border-radius: 999px; padding: 6px 14px; min-height: 40px;
-  background: transparent; box-shadow: inset 0 0 0 1px rgba(122, 90, 16, .35); color: var(--gold-text);
-  font-size: 13px; font-weight: 600; letter-spacing: .04em; font-variant-numeric: tabular-nums;
-  transition: background-color 400ms var(--ease-lux), color 400ms var(--ease-lux), box-shadow 400ms var(--ease-lux);
-}
-.trace__try button:hover, .trace__try button:focus-visible { background: var(--gold-text); color: var(--paper); box-shadow: inset 0 0 0 1px var(--gold-text); }
-/* certificate: paper sheet inside a double gold rule */
-.trace__card {
-  position: relative; min-height: 400px; padding: clamp(32px, 4vw, 48px);
-  background: var(--paper);
-  box-shadow: inset 0 0 0 1px rgba(197, 155, 39, .55), inset 0 0 0 7px var(--paper), inset 0 0 0 8px rgba(197, 155, 39, .3);
-}
-.trace__placeholder { min-height: 320px; display: grid; place-content: center; justify-items: center; text-align: center; color: var(--ink-soft); }
-.trace__placeholder .ic { width: 44px; height: 44px; stroke-width: 1.4; color: var(--gold); margin-bottom: 14px; animation: float 4s ease-in-out infinite; }
-.trace__placeholder p { margin: 0; font-family: var(--font-display); font-style: italic; font-size: 1.35rem; color: var(--ink-soft); }
-.trace__result { animation: rise 700ms var(--ease-lux) both; }
-.trace__status { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: var(--tint-leaf); color: var(--leaf-text); font-size: 13px; font-weight: 700; letter-spacing: .04em; }
-.trace__status--sample { background: var(--tint-gold); color: var(--gold-text); }
-.trace__status .ic { width: 14px; height: 14px; }
-.trace__result h3 { font-family: var(--font-display); font-size: clamp(1.75rem, 1.4rem + 1vw, 2.25rem); font-weight: 500; line-height: 1.1; color: var(--forest); margin: 16px 0 6px; }
-.trace__id { font-size: 13px; font-weight: 600; letter-spacing: .08em; color: var(--gold-text); font-variant-numeric: tabular-nums; }
-/* timeline: a gold line draws across, then each date rises */
-.trace__timeline { position: relative; list-style: none; margin: 28px 0; padding: 22px 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.trace__timeline::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gold); transform-origin: 0 50%; animation: draw 1.1s var(--ease-lux) .15s both; }
-.trace__timeline li { position: relative; font-size: 13px; color: var(--ink-soft); animation: rise 700ms var(--ease-lux) both; animation-delay: calc(350ms + var(--n) * 160ms); }
-.trace__timeline li::before { content: ""; position: absolute; top: -27px; left: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 4px var(--paper); }
-.trace__timeline b { display: block; margin-top: 2px; font-family: var(--font-display); font-size: 1.3rem; font-weight: 500; color: var(--forest); font-variant-numeric: lining-nums tabular-nums; }
-.trace__rows { display: grid; gap: 12px; margin: 0; font-size: 14.5px; }
-.trace__rows div { display: grid; grid-template-columns: 96px 1fr; gap: 12px; }
-.trace__rows dt { color: var(--ink-soft); }
-.trace__rows dd { margin: 0; font-weight: 500; color: var(--ink); }
-.trace__error { color: var(--lotus-deep); font-weight: 600; text-align: center; padding-top: 120px; }
-@keyframes draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
 /* ---------- Reviews — quotes on forest ---------- */
 .reviews { background: var(--forest); color: var(--paper); }
@@ -615,15 +544,10 @@ html.motion [data-lines]:not([data-split]) { opacity: 0; }
 .story__note { margin: 0; padding-left: 20px; border-left: 2px solid var(--gold); color: var(--ink); max-width: 52ch; }
 
 @media (max-width: 920px) {
-  .trace__grid, .story__grid { grid-template-columns: 1fr; }
+  .story__grid { grid-template-columns: 1fr; }
   .story__photo { max-width: 380px; }
 }
 @media (max-width: 600px) {
-  .trace__form { flex-direction: column; }
-  .trace__timeline { grid-template-columns: 1fr; padding: 0 0 0 22px; gap: 14px; }
-  .trace__timeline::before { top: 0; bottom: 0; left: 0; right: auto; width: 2px; height: auto; transform-origin: 50% 0; animation-name: drawY; }
-  .trace__timeline li::before { top: 6px; left: -26px; }
-  .trace__rows div { grid-template-columns: 1fr; gap: 2px; }
   .reviews__row { grid-template-columns: 1fr; }
 }
 @keyframes drawY { from { transform: scaleY(0); } to { transform: scaleY(1); } }
@@ -659,6 +583,10 @@ html.motion [data-lines]:not([data-split]) { opacity: 0; }
 }
 .footer__base { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 36px; font-size: 13px; }
 .footer__base p { margin: 0; }
+.pyp-credit { display: inline-flex; align-items: center; gap: 10px; }
+.pyp-credit img { height: 48px; width: auto; }
+.pyp-credit strong { font-weight: 600; color: var(--white); }
+.footer__base { align-items: center; }
 .credits { opacity: .85; }   /* ~5.9:1 on the footer, AA for small text */
 
 @media (max-width: 920px) {
@@ -673,8 +601,6 @@ html.motion [data-lines]:not([data-split]) { opacity: 0; }
 html.motion [data-reveal] { opacity: 0; }
 
 /* ---------- Keyframes ---------- */
-@keyframes rise { from { opacity: 0; translate: 0 12px; } to { opacity: 1; translate: 0 0; } }
-@keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -7px; } }
 @keyframes spin { to { rotate: 360deg; } }
 @keyframes marquee { to { transform: translateX(-50%); } }
 

@@ -9,16 +9,18 @@
   <meta property="og:title" content="Rangaa Roots | Rooted in Tradition">
   <meta property="og:description" content="Hand-churned A2 Bilona Ghee and traditional organic foods from native Tamil Nadu farms.">
   <meta property="og:image" content="assets/img/ghee-dabba.jpg">
-  <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
   <!-- set before first paint: CSS hides animated parts only while this class is on -->
-  <script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("motion");</script>
+  <script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("motion");
+  // the intro film: first visit of a session, unless arriving at a deep link or saving data (?intro forces it)
+  try { if (document.documentElement.classList.contains("motion") && !navigator.connection?.saveData && (/[?&]intro\b/.test(location.search) || (!location.hash && !sessionStorage.getItem("rr-intro")))) document.documentElement.classList.add("intro-on", "intro-through"); } catch (e) {}</script>
   <link rel="preload" as="image" href="assets/img/gopuram.webp" type="image/webp" media="(min-width: 921px)">
   <link rel="preload" as="image" href="assets/img/gopuram-1080.webp" type="image/webp" media="(max-width: 920px)">
   <link rel="preload" href="assets/fonts/cormorant-garamond-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/cormorant-garamond-italic-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/manrope-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/vendor/lenis/lenis.css">
-  <link rel="stylesheet" href="assets/css/styles.css?v=25">
+  <link rel="stylesheet" href="assets/css/styles.css?v=33">
 </head>
 <body>
 
@@ -30,7 +32,6 @@
     <symbol id="i-wheat" viewBox="0 0 24 24"><path d="M2 22 16 8"/><path d="M3.47 12.53 5 11l1.53 1.53a3.5 3.5 0 0 1 0 4.94L5 19l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z"/><path d="M7.47 8.53 9 7l1.53 1.53a3.5 3.5 0 0 1 0 4.94L9 15l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z"/><path d="M11.47 4.53 13 3l1.53 1.53a3.5 3.5 0 0 1 0 4.94L13 11l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z"/><path d="M20 2h2v2a4 4 0 0 1-4 4h-2V6a4 4 0 0 1 4-4Z"/><path d="M11.47 17.47 13 19l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L5 19l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z"/><path d="M15.47 13.47 17 15l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L9 15l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z"/><path d="M19.47 9.47 21 11l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L13 11l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z"/></symbol>
     <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
-    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
     <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
@@ -41,9 +42,18 @@
     <symbol id="i-jar" viewBox="0 0 24 24"><path d="M8 2h8v3H8z"/><path d="M7 5h10a2 2 0 0 1 2 2v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7a2 2 0 0 1 2-2z"/><path d="M5 11h14"/></symbol>
     <symbol id="i-pot" viewBox="0 0 24 24"><path d="M5 9h14l-1.5 9a3 3 0 0 1-3 2.5h-5a3 3 0 0 1-3-2.5z"/><path d="M8 9a4 4 0 0 1 8 0"/><path d="M3 9h18"/></symbol>
     <symbol id="i-churn" viewBox="0 0 24 24"><path d="M12 2v13"/><path d="M8 4c2 1 6 1 8 0"/><path d="M6 12h12l-1 8a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z"/><path d="M9 15h6"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
     <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2.5l2.94 5.96 6.56.95-4.75 4.63 1.12 6.54L12 17.5l-5.87 3.08 1.12-6.54L2.5 9.41l6.56-.95z"/></symbol>
   </defs>
 </svg>
+
+<!-- ============ INTRO FILM (shown by the head script; removed by intro.js when not needed) ============ -->
+<div class="intro" id="intro">
+  <video class="intro__video" id="introVideo" poster="assets/video/intro-poster.webp" muted playsinline preload="auto" aria-hidden="true"></video>
+  <button class="intro__skip" id="introSkip" type="button">Skip intro</button>
+</div>
+<script src="assets/js/intro.js?v=2"></script>
 
 <a class="skip" href="#main">Skip to content</a>
 <div class="progress" id="progress" aria-hidden="true"></div>
@@ -52,15 +62,14 @@
 <header class="nav" id="nav">
   <div class="nav__inner container">
     <a class="brand" href="#top">
-      <img src="assets/img/logo.svg" alt="" width="44" height="44">
+      <img src="assets/img/logo-round-240.webp" alt="" width="56" height="56">
       <span class="brand__text"><b>RANGAA ROOTS</b><small>Rooted in Tradition</small></span>
     </a>
     <nav class="nav__links" id="navLinks" aria-label="Primary">
       <a href="#ghee" style="--i:0">A2 Ghee</a>
       <a href="#shop" style="--i:1">Products</a>
       <a href="#process" style="--i:2">Bilona Process</a>
-      <a href="#trace" style="--i:3">Traceability</a>
-      <a href="#story" style="--i:4">Our Story</a>
+      <a href="#story" style="--i:3">Our Story</a>
       <span class="nav__ink" id="navInk" aria-hidden="true"></span>
     </nav>
     <div class="nav__actions">
@@ -118,22 +127,9 @@
   <div class="container ghee__grid">
     <div class="ghee__media">
       <div class="ghee__frame" data-glow data-parallax="6">
-        <div class="ghee__img jar" data-play>
-          <!-- the product photo, cut into layers (assets/img/jar): an empty open jar fills with ghee
-               from a pouring stream, the real lid drops on and is screwed down, then the untouched
-               photo takes over. CSS: "Ghee jar" -->
-          <img class="jar__layer jar__empty" src="assets/img/jar/jar-empty.webp" alt="" width="582" height="644">
-          <img class="jar__layer jar__full" src="assets/img/jar/jar-full.webp" alt="" width="582" height="644">
-          <span class="jar__level" aria-hidden="true"></span>
-          <span class="jar__pour" aria-hidden="true"></span>
-          <span class="jar__cap" aria-hidden="true">
-            <img src="assets/img/jar/jar-lid.webp" alt="" width="459" height="92">
-            <span class="jar__sheen"></span>
-          </span>
-          <picture class="jar__layer jar__photo">
-            <source srcset="assets/img/jar/jar-sealed.webp" type="image/webp">
-            <img src="assets/img/jar/jar-sealed.jpg" alt="Rangaa Roots A2 Cow Ghee in a 500 ml glass jar with a black lid, made by the traditional Bilona method" width="582" height="644">
-          </picture>
+        <div class="ghee__img film" data-film>
+          <video src="assets/video/ghee.mp4" poster="assets/video/ghee-poster.webp" muted loop playsinline preload="none" width="848" height="478" aria-label="Golden ghee poured into a glass jar, then the Rangaa Roots A2 Cow Ghee jar with its lid being closed"></video>
+          <button class="film__toggle" type="button" aria-label="Play video"><svg class="ic film__pause" aria-hidden="true"><use href="#i-pause"/></svg><svg class="ic film__play" aria-hidden="true"><use href="#i-play"/></svg></button>
         </div>
       </div>
       <div class="ghee__seal" aria-hidden="true">
@@ -201,7 +197,7 @@
     </div>
     <div class="grid" id="grid" aria-live="polite"></div>
     <p class="empty" id="empty" hidden>No products match your search. Try “malt” or “soup”.</p>
-    <p class="shop__all"><a class="btn btn--paper" href="products.html">See all 35 products <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a></p>
+    <p class="shop__all"><a class="btn btn--paper" href="products.html">View all products <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a></p>
   </div>
 </section>
 
@@ -222,31 +218,6 @@
       <article class="why__card" data-reveal><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg><h3>Traceable Products</h3><p>Every jar carries a verified batch ID, farm origin and packed date.</p></article>
       <article class="why__card" data-reveal><svg class="ic" aria-hidden="true"><use href="#i-jar"/></svg><h3>Carefully Packed</h3><p>Food-grade glass and recyclable canisters. Zero synthetic preservatives.</p></article>
       <article class="why__card" data-reveal><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg><h3>Talk to the Makers</h3><p>Questions about a product? Chat directly with our team on WhatsApp.</p></article>
-    </div>
-  </div>
-</section>
-
-<!-- ============ TRACEABILITY ============ -->
-<section class="section trace" id="trace">
-  <div class="container trace__grid">
-    <div class="trace__copy">
-      <p class="eyebrow" data-reveal>Know Your Food</p>
-      <h2 class="h2" data-reveal>Trace any jar back to its farm</h2>
-      <p class="trace__lead" data-reveal>Enter the batch number printed on your pack to see where it was grown, how it was processed and when it was packed.</p>
-      <form class="trace__form" id="traceForm" data-reveal>
-        <label class="sr-only" for="traceInput">Batch number</label>
-        <input id="traceInput" placeholder="e.g. RR-URAD-2026-004" autocomplete="off" spellcheck="false">
-        <button class="btn btn--primary" type="submit">Trace</button>
-      </form>
-      <p class="trace__try" data-reveal>Try: <span id="traceSamples"></span></p>
-    </div>
-    <div class="trace__cert" data-reveal>
-      <div class="trace__card" id="traceResult" aria-live="polite">
-        <div class="trace__placeholder">
-          <svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>
-          <p>Your batch story will appear here.</p>
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -281,7 +252,7 @@
 <!-- ============ CTA ============ -->
 <section class="cta">
   <div class="container cta__inner">
-    <img class="cta__logo" src="assets/img/logo.svg" alt="" width="64" height="64" data-reveal>
+    <img class="cta__logo" src="assets/img/logo-round-240.webp" alt="" width="96" height="96" data-reveal>
     <h2 data-lines>Bring home the taste of tradition</h2>
     <p data-reveal>Have a question about our ghee, malts or grains? Talk to the Rangaa Roots team directly.</p>
     <div data-reveal>
@@ -296,12 +267,12 @@
 <footer class="footer">
   <div class="container footer__grid">
     <div>
-      <a class="brand brand--light" href="#top"><img src="assets/img/logo.svg" alt="" width="44" height="44"><span class="brand__text"><b>RANGAA ROOTS</b><small>Rooted in Tradition</small></span></a>
+      <a class="brand brand--light" href="#top"><img src="assets/img/logo-round-240.webp" alt="" width="56" height="56"><span class="brand__text"><b>RANGAA ROOTS</b><small>Rooted in Tradition</small></span></a>
       <p class="footer__about">100% natural &amp; traceable foods from native Tamil Nadu farms.</p>
     </div>
     <div>
       <h3>Products</h3>
-      <ul><li><a href="#ghee">A2 Bilona Ghee</a></li><li><a href="#shop">Functional Malts</a></li><li><a href="#shop">Herbal Soups</a></li><li><a href="#shop">Thokku &amp; Wellness</a></li></ul>
+      <ul><li><a href="#family-ghee-oils">Ghee &amp; Oils</a></li><li><a href="#family-sweeteners">Natural Sweeteners</a></li><li><a href="#family-malts">Health Mixes &amp; Malts</a></li><li><a href="#family-thokku">Thokku</a></li><li><a href="#family-soups">Herbal Soup Blends</a></li><li><a href="#family-grains">Millets, Rice &amp; Dal</a></li><li><a href="#family-care">Hair &amp; Skin Care</a></li></ul>
     </div>
     <div>
       <h3>Visit</h3>
@@ -319,6 +290,7 @@
   <div class="footer__mark container" data-mark="Rangaa Roots" aria-hidden="true"></div>
   <div class="container footer__base">
     <p>© <span id="year"></span> Rangaa Roots. All rights reserved.</p>
+    <span class="pyp-credit">Created by <img src="assets/img/pickyourpixel.webp?v=2026-11-02" alt="" width="84" height="48" loading="lazy" decoding="async"> <strong>Pick your Pixel</strong></span>
     <p class="credits">Photos: Srirangam Rajagopuram by N. Vivekananthamoorthy; ghee by Phadke09 &amp; Hartej.hundal. All CC BY-SA 4.0, via Wikimedia Commons.</p>
   </div>
 </footer>
@@ -327,8 +299,9 @@
 <script src="assets/vendor/gsap/ScrollTrigger.min.js" defer></script>
 <script src="assets/vendor/lenis/lenis.min.js" defer></script>
 <script src="assets/js/scroll.js?v=24" defer></script>
-<script src="assets/js/data.js?v=24" defer></script>
-<script src="assets/js/motion.js?v=24" defer></script>
-<script src="assets/js/main.js?v=24" defer></script>
+<script src="assets/js/data.js?v=27" defer></script>
+<script src="assets/js/catalog.js?v=4" defer></script>
+<script src="assets/js/motion.js?v=25" defer></script>
+<script src="assets/js/main.js?v=29" defer></script>
 </body>
 </html>
