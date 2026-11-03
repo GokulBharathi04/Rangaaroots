@@ -14,9 +14,9 @@ rangaa-roots-website/
 ├── assets/
 │   ├── css/styles.css      # theme: colour + type tokens, sections, hero entrance
 │   ├── js/scroll.js        # Lenis smooth scrolling + header-offset anchor links
-│   ├── js/data.js          # products, reviews, batch records (edit content here)
+│   ├── js/data.js          # products, reviews (edit content here)
 │   ├── js/motion.js        # GSAP motion components (see below)
-│   ├── js/main.js          # renders content: filters, search, tracer
+│   ├── js/main.js          # renders content: filters, search
 │   ├── fonts/              # Cormorant Garamond + Manrope (Google Fonts, SIL OFL), Latin subset
 │   ├── vendor/             # lenis 1.3.27 (lenis.min.js, lenis.css), gsap 3.13.0 + ScrollTrigger
 │   └── img/                # logo, hero gopuram, ghee photos, product artwork (.jpg + .webp)
@@ -51,7 +51,7 @@ To preview locally: `python -m http.server 8000` in this folder, then open http:
 | `--paper` / `--desk` / `--kraft` | `#FFFDF8` / `#F2EDE4` / `#E9DFCD` | emblem disc | page and section grounds |
 
 Every colour value is unchanged from the original site; all of them now live as tokens in `:root`.
-The temple background (`gopuram.jpg`, with the same framing, tint and fade) and `logo.svg` are untouched.
+The temple background (`gopuram.jpg`, with the same framing, tint and fade) is untouched. The logo comes from `Ranga Roots Logo Png.png`, as `logo-round-*` and `favicon.png`.
 
 **Type:** Cormorant Garamond for headings, quotes and figures; Manrope for text and UI. Both are self-hosted
 (`assets/fonts/`) so the first paint does not wait on another server.
@@ -81,14 +81,12 @@ If GSAP fails to load, the `motion` class is removed from `<html>` and the page 
 
 - **Products:** `assets/js/data.js → products`. `size` is optional. Images live in `assets/img/products/`.
 - **Contact / WhatsApp number:** `assets/js/data.js → brand`, plus the hard-coded `wa.me` links in `index.html`.
-- **Trace batches:** `assets/js/data.js → batches`. `RR-GHEE-2026-011` is marked `sample: true` and shows a "Sample record" label. Replace it with a real ghee batch before launch.
 - After changing CSS/JS, bump the `?v=` number (currently 18) on the `<link>`/`<script>` tags in `index.html` so returning visitors get the new files.
 
 ## Before going live — please verify
 
 - **Ghee photos are stock stand-ins** (Wikimedia Commons). Replace `assets/img/ghee-dabba.jpg` and `ghee-jar.jpg` with Rangaa Roots' own product photography.
 - Product images on rangaaroots.com had **mismatched filenames** (e.g. `fig-roll.jpg` showed Black Cumin). They've been renamed here to match their content. Fig Roll, Moringa Soup and Karuppu Kavuni were left out because no matching artwork exists yet.
-- The "Sample record" ghee batch above.
 
 ## Image credits
 

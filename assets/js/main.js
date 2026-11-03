@@ -2,8 +2,17 @@
  * Showcase site: products link to a WhatsApp enquiry, nothing is sold on-site.
  * Motion lives in motion.js; this file renders content and wires it up. */
 (() => {
-  const { brand, ghee, categories, products, batches, reviews } = window.RR;
+  const { brand, ghee, products, reviews } = window.RR;
+  const { families, products: catalog } = window.RRCatalog;
   const M = window.Motion;
+  // no scrolling under the intro film; it hands the page over when it lets go
+  if (window.Intro.active) {
+    window.Scroll.stop();
+    window.Intro.released.then(() => {
+      window.Scroll.start();
+      window.Scroll.lenis?.scrollTo(0, { immediate: true });   // a stray key press under the film
+    });
+  }
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const icon = (id, cls = "ic") => `<svg class="${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
@@ -58,7 +67,7 @@
       placeInk();
     });
   }, { rootMargin: "-45% 0px -50% 0px" });
-  ["ghee", "shop", "process", "trace", "story"].forEach((id) => sectionObs.observe(document.getElementById(id)));
+  ["ghee", "shop", "process", "story"].forEach((id) => sectionObs.observe(document.getElementById(id)));
   // leaving all tracked sections (back to the hero) clears the underline
   addEventListener("scroll", () => {
     if (scrollY >= innerHeight * 0.5) return;
@@ -72,16 +81,46 @@
   $("#gheeWa").href = waLink(buildEnquiryMessage(ghee));
 
   /* ---------- Products: render once, filter with FLIP ---------- */
-  const grid = $("#grid");
-  grid.innerHTML = products.map((p) => `
-    <article class="card" data-id="${p.id}" data-cat="${p.cat}">
-      <div class="card__img">
+  // every catalogue family, plus the products only the home page lists
+  const photoOf = new Map(products.filter((p) => p.of).map((p) => [p.of, p]));
+  const shelves = families.map((f) => ({
+    ...f,
+    items: [
+      ...catalog.filter((c) => c.family === f.id).map((c) => {
+        const photo = photoOf.get(c.id);
+        return photo ? { ...photo, family: f.id } : { id: c.id, family: f.id, name: c.lines.join(" "), note: c.note, size: c.size, img: c.photo };
+      }),
+      ...products.filter((p) => p.family === f.id),
+    ],
+  }));
+  const allItems = shelves.flatMap((s) => s.items);
+
+  const cardImage = (p) => `<div class="card__img">
         <picture>
           <source srcset="assets/img/products/${p.img.replace(/\.jpg$/, "-480.webp")} 480w, assets/img/products/${p.img.replace(/\.jpg$/, ".webp")} 900w"
             sizes="(max-width: 600px) 46vw, (max-width: 1080px) 31vw, 300px" type="image/webp">
-          <img src="assets/img/products/${p.img}" alt="${p.name}" loading="lazy" width="600" height="600">
+          <img src="assets/img/products/${p.img}" alt="${p.name}" loading="lazy" width="600" height="750">
         </picture>
+      </div>`;
+
+  const shelfFilm = (s) => `
+      <div class="film shelf__film" data-film data-curtain>
+        <video src="assets/video/${s.film}.mp4" poster="assets/video/${s.film}-poster.webp" muted loop playsinline preload="none" width="848" height="478" aria-label="${s.filmLabel}"></video>
+        <button class="film__toggle" type="button" aria-label="Play video"><svg class="ic film__pause" aria-hidden="true"><use href="#i-pause"/></svg><svg class="ic film__play" aria-hidden="true"><use href="#i-play"/></svg></button>
+      </div>`;
+
+  const grid = $("#grid");
+  grid.innerHTML = shelves.map((s) => `
+    <header class="shelf ${s.film ? "shelf--film" : ""}" id="family-${s.id}" data-family="${s.id}">
+      <div>
+        <h3 class="shelf__name">${s.name} <span>${s.items.length}</span></h3>
+        <p class="shelf__blurb">${s.blurb}</p>
       </div>
+      ${s.film ? shelfFilm(s) : ""}
+    </header>
+    ${s.items.map((p) => `
+    <article class="card" data-id="${p.id}">
+      ${cardImage(p)}
       <div class="card__body">
         ${p.size ? `<span class="card__size">${p.size}</span>` : ""}
         <h3>${p.name}</h3>
@@ -90,8 +129,9 @@
           ${icon("chat")} <span>Enquire</span> ${icon("arrow", "ic ic--arrow")}
         </a>
       </div>
-    </article>`).join("");
+    </article>`).join("")}`).join("");
   const cards = $$(".card", grid);
+  const shelfHeads = $$(".shelf", grid);
   // first appearance: each row of cards rises in sequence. Cards are never hidden by CSS,
   // so one filtered out before it was seen still shows normally when it comes back.
   if (!M.reduce) {
@@ -106,22 +146,23 @@
 
   let activeCat = "all", query = "";
   const chips = $("#chips");
-  chips.insertAdjacentHTML("beforeend", categories.map((c) =>
-    `<button type="button" class="chip" role="tab" data-cat="${c.id}" aria-selected="${c.id === activeCat}">${c.label}</button>`).join(""));
+  chips.insertAdjacentHTML("beforeend", [{ id: "all", short: "All" }, ...families].map((c) =>
+    `<button type="button" class="chip" role="tab" data-cat="${c.id}" aria-selected="${c.id === activeCat}">${c.short}</button>`).join(""));
   let placeIndicator = () => {};   // set once every section is rendered (see below)
 
   const applyFilter = () => {
     const q = query.trim().toLowerCase();
     M.flip(cards, () => {
-      let shown = 0;
+      const shownIn = new Set();
       cards.forEach((c) => {
-        const p = products.find((x) => x.id === c.dataset.id);
-        const match = (activeCat === "all" || p.cat === activeCat) &&
+        const p = allItems.find((x) => x.id === c.dataset.id);
+        const match = (activeCat === "all" || p.family === activeCat) &&
           (!q || (p.name + " " + p.note).toLowerCase().includes(q));
         c.hidden = !match;
-        if (match) shown++;
+        if (match) shownIn.add(p.family);
       });
-      $("#empty").hidden = shown > 0;
+      shelfHeads.forEach((h) => { h.hidden = !shownIn.has(h.dataset.family); });
+      $("#empty").hidden = shownIn.size > 0;
     });
   };
   chips.addEventListener("click", (e) => {
@@ -137,39 +178,6 @@
   $("#search").addEventListener("input", (e) => {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => { query = e.target.value; applyFilter(); }, 160);
-  });
-
-  /* ---------- Traceability ---------- */
-  $("#traceSamples").innerHTML = batches.map((b) => `<button type="button" data-batch="${b.id}">${b.id}</button>`).join("");
-  const trace = (id) => {
-    const b = batches.find((x) => x.id === id.trim().toUpperCase());
-    const out = $("#traceResult");
-    if (!b) {
-      out.innerHTML = `<p class="trace__error">We couldn't find batch “${id.replace(/[<>&"]/g, "")}”.<br>Please check the code on your pack.</p>`;
-      if (!M.reduce) out.animate([{ translate: "-6px 0" }, { translate: "6px 0" }, { translate: "-3px 0" }, { translate: "0 0" }], { duration: 360 });
-      return;
-    }
-    out.innerHTML = `
-      <div class="trace__result">
-        <span class="trace__status ${b.sample ? "trace__status--sample" : ""}">${icon("shield")} ${b.sample ? "Sample record" : "Verified batch"}</span>
-        <h3>${b.product}</h3>
-        <span class="trace__id">${b.id}</span>
-        <ol class="trace__timeline">
-          <li style="--n:0">Harvested<b>${b.harvested}</b></li>
-          <li style="--n:1">Processed<b>${b.processed}</b></li>
-          <li style="--n:2">Packed<b>${b.packed}</b></li>
-        </ol>
-        <dl class="trace__rows">
-          <div><dt>Farm</dt><dd>${b.farm}</dd></div>
-          <div><dt>Method</dt><dd>${b.method}</dd></div>
-          <div><dt>Purity</dt><dd>${b.purity} · Moisture ${b.moisture} · Heavy metals not detected</dd></div>
-        </dl>
-      </div>`;
-  };
-  $("#traceForm").addEventListener("submit", (e) => { e.preventDefault(); trace($("#traceInput").value); });
-  $("#traceSamples").addEventListener("click", (e) => {
-    const b = e.target.closest("[data-batch]");
-    if (b) { $("#traceInput").value = b.dataset.batch; trace(b.dataset.batch); }
   });
 
   /* ---------- Reviews (paper notes) ---------- */

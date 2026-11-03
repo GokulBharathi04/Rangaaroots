@@ -13,13 +13,13 @@
   };
 
   const FAMILIES = [
-    { id: "ghee-oils", name: "Ghee & Cold-pressed Oils", blurb: "Hand-churned A2 ghee and wood-pressed coconut oil, in food-grade glass." },
-    { id: "sweeteners", name: "Natural Sweeteners", blurb: "Unrefined sugars from coconut blossom and palm sap: no bleaching, no chemicals." },
-    { id: "malts", name: "Health Mixes & Malts", blurb: "Stone-milled drink mixes from native urad, ragi, fruits and nuts." },
-    { id: "thokku", name: "Thokku", blurb: "Slow-cooked relishes of greens and vegetables in cold-pressed gingelly oil." },
-    { id: "soups", name: "Herbal Soup Blends", blurb: "Traditional Tamil soup herbs, sun-dried and powdered: just add hot water." },
-    { id: "grains", name: "Millets, Heritage Rice & Dal", blurb: "Native millets and heritage paddy varieties, single-polished to keep the bran." },
-    { id: "care", name: "Hair & Skin Care", blurb: "Kitchen-garden ingredients for hair and skin, made in small batches." },
+    { id: "ghee-oils", film: "coconut", filmLabel: "Film of the Rangaa Roots coconut range, from palm trees and fresh coconut to the finished jars and bottles", short: "Ghee & Oils", name: "Ghee & Cold-pressed Oils", blurb: "Hand-churned A2 ghee and wood-pressed coconut oil, in food-grade glass." },
+    { id: "sweeteners", short: "Sweeteners", name: "Natural Sweeteners", blurb: "Unrefined sugars from coconut blossom and palm sap: no bleaching, no chemicals." },
+    { id: "malts", short: "Malts & Mixes", name: "Health Mixes & Malts", blurb: "Stone-milled drink mixes from native urad, ragi, fruits and nuts." },
+    { id: "thokku", film: "thokku", filmLabel: "Film of thokku being made in small batches, ending on five jars from the range", short: "Thokku", name: "Thokku", blurb: "Slow-cooked relishes of greens and vegetables in cold-pressed gingelly oil." },
+    { id: "soups", short: "Soups", name: "Herbal Soup Blends", blurb: "Traditional Tamil soup herbs, sun-dried and powdered: just add hot water." },
+    { id: "grains", film: "rice", filmLabel: "Film of heritage rice falling onto a heap, ending on the millet, rice and dal pouches", short: "Millets & Rice", name: "Millets, Heritage Rice & Dal", blurb: "Native millets and heritage paddy varieties, single-polished to keep the bran." },
+    { id: "care", short: "Hair & Skin", name: "Hair & Skin Care", blurb: "Kitchen-garden ingredients for hair and skin, made in small batches." },
   ];
 
   const P = (family, id, lines, extra) => ({ family, id, lines, food: family !== "care", ...extra });
@@ -76,6 +76,15 @@
     P("care", "herbal-hair-oil", ["Herbal Hair Oil"], cream("oilBottle", { art: "hairOil", fill: "#c9a02a", kind: "liquid", size: "100ml", tagline: "Hibiscus, curry leaf & bhringraj in coconut oil", note: "Hibiscus, curry leaf and bhringraj slow-infused in coconut oil." })),
     P("care", "saffron-serum", ["Saffron Serum"], cream("dropper", { art: "serum", fill: "#e8a33a", kind: "liquid", size: "30ml", tagline: "Kashmiri saffron & kumkumadi oils", note: "Kashmiri saffron in a light kumkumadi oil blend." })),
   ];
+
+  // assets/img/products/<id>.jpg, except where the photo already had another name
+  const PHOTO_NAMES = {
+    "a2-ghee": "a2-cow-ghee", "coconut-sugar": "coconut-sugar", "palm-sugar": "udangudi-palm-jaggery",
+    "abc-malt": "rangaa-roots-abc-malt", "choco-black-urad": "rangaa-roots-choco-black-urad-kids",
+    "uradfit-nutri-blend": "rangaa-roots-uradfit-men", "blackboozt-nutri-plus": "rangaa-roots-blackboozt-elder",
+    "banana-stem-soup": "banana-stem-soup", "vallarai-thokku": "vallarai-thokku",
+  };
+  products.forEach((p) => { p.photo = `${PHOTO_NAMES[p.id] || p.id}.jpg`; });
 
   window.RRCatalog = { families: FAMILIES, products };
 })();
