@@ -349,16 +349,6 @@ html.intro-on .intro, .intro.is-leaving { display: block; position: fixed; inset
     mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
   }
 }
-.intro__skip {
-  position: absolute; right: var(--gutter); bottom: 24px; min-height: 44px; padding: 8px 18px; border: 0; border-radius: 999px;
-  background: rgba(20, 56, 35, .1); color: var(--forest); font-size: 14px; font-weight: 600;
-  transition: transform 160ms ease-out, background-color 200ms ease;
-  animation: introSkip 400ms ease-out 800ms both;
-}
-.intro__skip:active { transform: scale(.97); }
-@media (hover: hover) and (pointer: fine) { .intro__skip:hover { background: rgba(20, 56, 35, .18); } }
-.intro.is-leaving .intro__skip { display: none; }
-@keyframes introSkip { from { opacity: 0; } }
 /* the hero waits behind the film, then comes forward with the camera */
 html.intro-on :is(.hero__bg, .hero .eyebrow, .hero__title .line__i, .hero__lead, .hero__cta .btn, .hero__stats .stat) { animation-play-state: paused; }
 html.motion.intro-through .hero__bg { animation-name: heroBgThrough; }

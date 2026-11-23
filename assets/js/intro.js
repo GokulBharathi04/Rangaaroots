@@ -38,7 +38,7 @@ window.Intro = (() => {
     try { sessionStorage.setItem("rr-intro", "1"); } catch (e) {}
     el.classList.add("is-leaving");   // keeps the overlay up once html.intro-on goes
 
-    if (!seamless) {   // skipped or failed: step aside quickly
+    if (!seamless) {   // failed or timed out: step aside quickly
       release();
       el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: "ease-out", fill: "both" }).onfinish = () => el.remove();
       return;
@@ -55,7 +55,6 @@ window.Intro = (() => {
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   video.addEventListener("ended", () => leave(true));
   video.addEventListener("error", () => leave(false));
-  document.getElementById("introSkip").addEventListener("click", () => leave(false));
   // a slow connection should not hold anyone at a still frame
   startGuard = setTimeout(() => leave(false), 2500);
   video.addEventListener("playing", () => clearTimeout(startGuard), { once: true });
